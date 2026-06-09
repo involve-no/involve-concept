@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, AlertCircle, Save, CheckCircle, RotateCcw, Calendar, Search, RefreshCw, Users, Trash2 } from 'lucide-react';
 import CountryFlag from '@/components/CountryFlag';
+import UserAvatar from '@/components/UserAvatar';
 
 interface Match {
   id: string;
@@ -630,12 +631,15 @@ export default function AdminPage() {
                 key={user.id}
                 className="glass-panel-light rounded-xl p-3 flex items-center justify-between border border-white/5"
               >
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-bold text-white truncate">{user.name}</span>
-                  <span className="text-[10px] text-gray-500 truncate">{user.email}</span>
-                  <span className="text-[10px] text-gray-600 mt-0.5">
-                    {user.predictionCount} tips · {user.totalPoints} poeng
-                  </span>
+                <div className="flex items-center gap-3 min-w-0">
+                  <UserAvatar name={user.name} className="w-8 h-8 text-xs font-bold" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-bold text-white truncate">{user.name}</span>
+                    <span className="text-[10px] text-gray-500 truncate">{user.email}</span>
+                    <span className="text-[10px] text-gray-600 mt-0.5">
+                      {user.predictionCount} tips · {user.totalPoints} poeng
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 ml-2">

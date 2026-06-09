@@ -23,13 +23,39 @@ export async function GET() {
       JOIN users u ON p.userId = u.id
     `).all() as { matchId: string; predictedScoreA: number; predictedScoreB: number; predictedWinner: string | null; points: number | null; userId: number; userName: string; userEmail: string }[];
 
-    // Group predictors by matchId
+    // Group predictors and calculate consensus by matchId
     const predictorsByMatch: Record<string, { userId: number; userName: string; userEmail: string; predictedScoreA: number; predictedScoreB: number; predictedWinner: string | null; points: number | null }[]> = {};
+    const consensusByMatch: Record<string, { winA: number; draw: number; winB: number; total: number }> = {};
+    
     allPredictions.forEach((p) => {
       if (!predictorsByMatch[p.matchId]) {
         predictorsByMatch[p.matchId] = [];
       }
       predictorsByMatch[p.matchId].push(p);
+
+      if (!consensusByMatch[p.matchId]) {
+        consensusByMatch[p.matchId] = { winA: 0, draw: 0, winB: 0, total: 0 };
+      }
+      
+      consensusByMatch[p.matchId].total++;
+      if (p.predictedScoreA > p.predictedScoreB) {
+        consensusByMatch[p.matchId].winA++;
+      } else if (p.predictedScoreA < p.predictedScoreB) {
+        consensusByMatch[p.matchId].winB++;
+      } else {
+        const isKnockout = p.matchId >= 'M073';
+        if (isKnockout) {
+          if (p.predictedWinner === 'teamA') {
+            consensusByMatch[p.matchId].winA++;
+          } else if (p.predictedWinner === 'teamB') {
+            consensusByMatch[p.matchId].winB++;
+          } else {
+            consensusByMatch[p.matchId].draw++;
+          }
+        } else {
+          consensusByMatch[p.matchId].draw++;
+        }
+      }
     });
 
     // Map predictions by matchId
@@ -77,6 +103,7 @@ export async function GET() {
             }
           : null,
         predictors: predictorsList,
+        consensus: consensusByMatch[match.id] || { winA: 0, draw: 0, winB: 0, total: 0 }
       };
     });
 

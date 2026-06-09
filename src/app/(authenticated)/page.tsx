@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Search, Save, CheckCircle, Clock, AlertCircle, HelpCircle, X, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/CountryFlag';
+import UserAvatar from '@/components/UserAvatar';
 
 interface Prediction {
   predictedScoreA: number;
@@ -33,6 +34,12 @@ interface Match {
     predictedScoreB?: number;
     points?: number | null;
   }[];
+  consensus?: {
+    winA: number;
+    draw: number;
+    winB: number;
+    total: number;
+  };
 }
 
 // Countdown component
@@ -96,6 +103,7 @@ export default function MatchesPage() {
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<{ id: number; name: string; email: string } | null>(null);
   const [showFinished, setShowFinished] = useState(false);
+  const [activeTab, setActiveTab] = useState<'matches' | 'standings'>('matches');
   
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -457,18 +465,13 @@ export default function MatchesPage() {
         {match.predictors && match.predictors.length > 0 && (
           <div className="flex items-center gap-2 py-1 border-t border-white/5 pt-2">
             <div className="flex -space-x-1.5 overflow-hidden">
-              {match.predictors.slice(0, 5).map((p) => {
-                const initials = p.userName.substring(0, 2).toUpperCase();
-                return (
-                  <div
-                    key={p.userId}
-                    className="inline-block h-5 w-5 rounded-full ring-1.5 ring-gray-900 bg-blue-600/20 border border-blue-500/30 text-[8px] font-black text-blue-300 flex items-center justify-center select-none"
-                    title={p.userName}
-                  >
-                    {initials}
-                  </div>
-                );
-              })}
+              {match.predictors.slice(0, 5).map((p) => (
+                <UserAvatar
+                  key={p.userId}
+                  name={p.userName}
+                  className="w-5 h-5 text-[8px] ring-1.5 ring-gray-900 border-none"
+                />
+              ))}
               {match.predictors.length > 5 && (
                 <div className="inline-block h-5 w-5 rounded-full ring-1.5 ring-gray-900 bg-gray-800 border border-white/10 text-[8px] font-black text-gray-300 flex items-center justify-center select-none">
                   +{match.predictors.length - 5}
@@ -478,6 +481,41 @@ export default function MatchesPage() {
             <span className="text-[9px] text-gray-400 font-semibold">
               {match.predictors.length} {match.predictors.length === 1 ? 'person har tippet' : 'personer har tippet'}
             </span>
+          </div>
+        )}
+
+        {/* Consensus Statistics (Folkets tips) */}
+        {match.consensus && match.consensus.total > 0 && (
+          <div className="py-2 border-t border-white/5 flex flex-col gap-1">
+            <div className="flex justify-between items-center text-[10px] text-gray-400 font-semibold">
+              <span className="flex items-center gap-1">📊 Folkets tips ({match.consensus.total} stemmer)</span>
+              <div className="flex gap-2 text-[9px] font-bold">
+                <span className="text-blue-400">H: {Math.round((match.consensus.winA / match.consensus.total) * 100)}%</span>
+                {match.id < 'M073' && (
+                  <span className="text-gray-400">U: {Math.round((match.consensus.draw / match.consensus.total) * 100)}%</span>
+                )}
+                <span className="text-red-400">B: {Math.round((match.consensus.winB / match.consensus.total) * 100)}%</span>
+              </div>
+            </div>
+            <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/5 flex">
+              <div
+                style={{ width: `${(match.consensus.winA / match.consensus.total) * 100}%` }}
+                className="h-full bg-blue-500 transition-all duration-500"
+                title={`Hjemme: ${Math.round((match.consensus.winA / match.consensus.total) * 100)}%`}
+              />
+              {match.id < 'M073' && (
+                <div
+                  style={{ width: `${(match.consensus.draw / match.consensus.total) * 100}%` }}
+                  className="h-full bg-gray-500 transition-all duration-500"
+                  title={`Uavgjort: ${Math.round((match.consensus.draw / match.consensus.total) * 100)}%`}
+                />
+              )}
+              <div
+                style={{ width: `${(match.consensus.winB / match.consensus.total) * 100}%` }}
+                className="h-full bg-red-500 transition-all duration-500"
+                title={`Borte: ${Math.round((match.consensus.winB / match.consensus.total) * 100)}%`}
+              />
+            </div>
           </div>
         )}
 
@@ -623,6 +661,166 @@ export default function MatchesPage() {
     );
   };
 
+  const calculateGroupStandings = () => {
+    const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+    const standings: Record<string, Record<string, { team: string; played: number; won: number; drawn: number; lost: number; gf: number; ga: number; gd: number; points: number }>> = {};
+    
+    groups.forEach(g => {
+      standings[g] = {};
+    });
+
+    const groupStageMatches = matches.filter(m => m.id < 'M073');
+
+    groupStageMatches.forEach(m => {
+      const groupName = m.description.replace('Group ', '').trim();
+      if (groups.includes(groupName)) {
+        if (m.teamA && m.teamA !== 'TBD') {
+          if (!standings[groupName][m.teamA]) {
+            standings[groupName][m.teamA] = { team: m.teamA, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0 };
+          }
+        }
+        if (m.teamB && m.teamB !== 'TBD') {
+          if (!standings[groupName][m.teamB]) {
+            standings[groupName][m.teamB] = { team: m.teamB, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0 };
+          }
+        }
+      }
+    });
+
+    groupStageMatches.forEach(m => {
+      const groupName = m.description.replace('Group ', '').trim();
+      if (!groups.includes(groupName)) return;
+
+      let scoreA: number | null = null;
+      let scoreB: number | null = null;
+
+      if (m.status === 'finished') {
+        scoreA = m.scoreA;
+        scoreB = m.scoreB;
+      } else {
+        const draft = draftScores[m.id];
+        if (draft && draft.a !== '' && draft.b !== '') {
+          scoreA = parseInt(draft.a, 10);
+          scoreB = parseInt(draft.b, 10);
+        } else if (m.prediction) {
+          scoreA = m.prediction.predictedScoreA;
+          scoreB = m.prediction.predictedScoreB;
+        }
+      }
+
+      if (scoreA !== null && scoreB !== null && !isNaN(scoreA) && !isNaN(scoreB)) {
+        const teamA = m.teamA;
+        const teamB = m.teamB;
+
+        if (standings[groupName][teamA] && standings[groupName][teamB]) {
+          standings[groupName][teamA].played++;
+          standings[groupName][teamB].played++;
+
+          standings[groupName][teamA].gf += scoreA;
+          standings[groupName][teamA].ga += scoreB;
+          standings[groupName][teamB].gf += scoreB;
+          standings[groupName][teamB].ga += scoreA;
+
+          if (scoreA > scoreB) {
+            standings[groupName][teamA].won++;
+            standings[groupName][teamA].points += 3;
+            standings[groupName][teamB].lost++;
+          } else if (scoreA < scoreB) {
+            standings[groupName][teamB].won++;
+            standings[groupName][teamB].points += 3;
+            standings[groupName][teamA].lost++;
+          } else {
+            standings[groupName][teamA].drawn++;
+            standings[groupName][teamA].points += 1;
+            standings[groupName][teamB].drawn++;
+            standings[groupName][teamB].points += 1;
+          }
+
+          standings[groupName][teamA].gd = standings[groupName][teamA].gf - standings[groupName][teamA].ga;
+          standings[groupName][teamB].gd = standings[groupName][teamB].gf - standings[groupName][teamB].ga;
+        }
+      }
+    });
+
+    const sortedStandings: Record<string, typeof standings[string][string][]> = {};
+    groups.forEach(g => {
+      sortedStandings[g] = Object.values(standings[g]).sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        if (b.gd !== a.gd) return b.gd - a.gd;
+        if (b.gf !== a.gf) return b.gf - a.gf;
+        return a.team.localeCompare(b.team);
+      });
+    });
+
+    return sortedStandings;
+  };
+
+  const renderStandingsSimulator = () => {
+    const standings = calculateGroupStandings();
+    
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in pb-12">
+        {Object.keys(standings).map((groupName) => (
+          <div key={groupName} className="glass-panel-light rounded-2xl border border-white/5 overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
+              <span className="font-black text-white text-xs uppercase tracking-wider">Gruppe {groupName}</span>
+              <span className="text-[10px] text-gray-400 font-semibold">Simulert tabell</span>
+            </div>
+            
+            <div className="p-3 overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="text-gray-500 font-black text-[9px] uppercase border-b border-white/5 pb-1 select-none">
+                    <th className="py-1 px-1.5 w-6 text-center">Pos</th>
+                    <th className="py-1 px-1.5">Lag</th>
+                    <th className="py-1 px-1.5 w-8 text-center">K</th>
+                    <th className="py-1 px-1.5 w-10 text-center">MF</th>
+                    <th className="py-1 px-1.5 w-8 text-center">P</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-medium">
+                  {standings[groupName].length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-4 text-center text-gray-500">Laster lag...</td>
+                    </tr>
+                  ) : (
+                    standings[groupName].map((row, index) => {
+                      const isPromoted = index < 2;
+                      return (
+                        <tr key={row.team} className="hover:bg-white/5 text-gray-300">
+                          <td className="py-2 px-1.5 text-center font-bold">
+                            <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black ${
+                              isPromoted ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gray-800 text-gray-400'
+                            }`}>
+                              {index + 1}
+                            </span>
+                          </td>
+                          <td className="py-2 px-1.5 flex items-center gap-1.5 min-w-[100px] truncate">
+                            <CountryFlag countryName={row.team} className="w-4 h-4 shrink-0" />
+                            <span className="font-bold text-white truncate text-[11px]" title={row.team}>{row.team}</span>
+                          </td>
+                          <td className="py-2 px-1.5 text-center text-gray-400">{row.played}</td>
+                          <td className="py-2 px-1.5 text-center text-gray-400 font-semibold">
+                            {row.gd > 0 ? `+${row.gd}` : row.gd}
+                          </td>
+                          <td className="py-2 px-1.5 text-center font-black text-white">{row.points}</td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-white/2 px-3 py-1.5 border-t border-white/5 text-[9px] text-gray-500 flex justify-between select-none">
+              <span>* Grønne går videre (Topp 2)</span>
+              <span>K: Kamper • P: Poeng</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
@@ -650,24 +848,64 @@ export default function MatchesPage() {
       <Countdown matches={matches} />
 
       {/* User Stats Card */}
-      <div className="glass-card rounded-2xl p-4 flex items-center justify-between border-l-4 border-l-blue-500 relative overflow-hidden">
-        <div className="space-y-1 relative z-10">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Ditt Dashboard</span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white">{totalPoints}</span>
-            <span className="text-xs font-bold text-gray-400 uppercase">poeng</span>
+      <div className="glass-card rounded-2xl p-4 flex flex-col gap-3.5 border-l-4 border-l-blue-500 relative overflow-hidden">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1 relative z-10">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Ditt Dashboard</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black text-white">{totalPoints}</span>
+              <span className="text-xs font-bold text-gray-400 uppercase">poeng</span>
+            </div>
+          </div>
+          <div className="text-right space-y-1 relative z-10">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Dine tips</span>
+            <div className="text-lg font-bold text-gray-200">
+              {predictedCount} <span className="text-xs text-gray-500">/ 104</span>
+            </div>
           </div>
         </div>
-        <div className="text-right space-y-1 relative z-10">
-          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Dine tips</span>
-          <div className="text-lg font-bold text-gray-200">
-            {predictedCount} <span className="text-xs text-gray-500">/ 104</span>
+        <div className="relative z-10 space-y-1">
+          <div className="flex justify-between items-center text-[10px] font-bold text-gray-500">
+            <span>Tippeframgang</span>
+            <span>{Math.round((predictedCount / 104) * 100)}%</span>
+          </div>
+          <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/5 border border-white/5">
+            <div
+              style={{ width: `${(predictedCount / 104) * 100}%` }}
+              className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
+            />
           </div>
         </div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
       </div>
 
-      {/* Search & Filter Controls */}
+      {/* Tab Navigation */}
+      <div className="flex rounded-xl bg-black/30 p-1 border border-white/5 relative z-10 select-none">
+        <button
+          onClick={() => setActiveTab('matches')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'matches'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          ⚽ Kamper
+        </button>
+        <button
+          onClick={() => setActiveTab('standings')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'standings'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          📊 Gruppetabeller
+        </button>
+      </div>
+
+      {activeTab === 'matches' ? (
+        <>
+          {/* Search & Filter Controls */}
       <div className="space-y-3 glass-panel-light p-3.5 rounded-xl border border-white/5">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
@@ -773,6 +1011,10 @@ export default function MatchesPage() {
             </div>
           )}
         </div>
+      )}
+      </>
+      ) : (
+        renderStandingsSimulator()
       )}
 
       {/* Rules Modal */}

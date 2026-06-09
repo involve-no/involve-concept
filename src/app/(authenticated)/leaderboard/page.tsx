@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Star, AlertCircle, RefreshCw, Eye, X, Lock } from 'lucide-react';
 import CountryFlag from '@/components/CountryFlag';
+import UserAvatar from '@/components/UserAvatar';
 
 interface LeaderboardUser {
   id: number;
@@ -204,13 +205,7 @@ export default function LeaderboardPage() {
                   </div>
                   
                   {/* Initials Avatar */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase ${
-                    isCurrentUser 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-white/5 text-gray-400 border border-white/10'
-                  }`}>
-                    {user.name.substring(0, 2)}
-                  </div>
+                  <UserAvatar name={user.name} className="w-8 h-8 text-xs font-bold" />
 
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-white truncate max-w-[140px]" title={user.name}>
