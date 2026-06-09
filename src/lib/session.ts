@@ -62,7 +62,7 @@ export async function setSession(data: SessionData): Promise<void> {
   const encrypted = encrypt(JSON.stringify(data));
   cookieStore.set(SESSION_COOKIE_NAME, encrypted, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.COOKIE_SECURE === 'true',
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 30, // 30 days
