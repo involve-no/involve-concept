@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, AlertCircle, Save, CheckCircle, RotateCcw, Calendar, Search, RefreshCw } from 'lucide-react';
+import { Shield, AlertCircle, Save, CheckCircle, RotateCcw, Calendar, Search, RefreshCw, Users, Trash2 } from 'lucide-react';
 import CountryFlag from '@/components/CountryFlag';
 
 interface Match {
@@ -17,6 +17,14 @@ interface Match {
   scoreB: number | null;
   penaltyScoreA?: number | null;
   penaltyScoreB?: number | null;
+}
+
+interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  predictionCount: number;
+  totalPoints: number;
 }
 
 export default function AdminPage() {
@@ -37,7 +45,45 @@ export default function AdminPage() {
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
 
+  // User management states
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+  const [userError, setUserError] = useState('');
+
   const router = useRouter();
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('/api/admin/users');
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    setDeletingUserId(userId);
+    setUserError('');
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kunne ikke slette bruker');
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      setDeleteConfirmId(null);
+    } catch (err: any) {
+      setUserError(err.message || 'Noe gikk galt');
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
 
   const handleAutoSync = async () => {
     setSyncing(true);
@@ -100,6 +146,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     verifyAdminAndFetchMatches();
+    fetchUsers();
   }, []);
 
   const handleScoreChange = (matchId: string, team: 'a' | 'b' | 'pa' | 'pb', val: string) => {
@@ -550,6 +597,84 @@ export default function AdminPage() {
           ))}
         </div>
       )}
+
+      {/* User Management Section */}
+      <div className="space-y-4 pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-purple-400" />
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Brukere ({users.length})</h3>
+          </div>
+          <button
+            onClick={fetchUsers}
+            className="p-1 text-gray-400 hover:text-white transition-all cursor-pointer rounded-lg hover:bg-white/5"
+            title="Oppdater brukerliste"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {userError && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-950/50 border border-red-500/30 p-3 text-xs text-red-400">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{userError}</span>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {users.length === 0 ? (
+            <div className="text-center py-8 text-xs text-gray-500">Ingen brukere registrert ennå.</div>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                className="glass-panel-light rounded-xl p-3 flex items-center justify-between border border-white/5"
+              >
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-bold text-white truncate">{user.name}</span>
+                  <span className="text-[10px] text-gray-500 truncate">{user.email}</span>
+                  <span className="text-[10px] text-gray-600 mt-0.5">
+                    {user.predictionCount} tips · {user.totalPoints} poeng
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 ml-2">
+                  {deleteConfirmId === user.id ? (
+                    <>
+                      <button
+                        onClick={() => setDeleteConfirmId(null)}
+                        className="px-2 py-1 rounded text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+                      >
+                        Avbryt
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        disabled={deletingUserId === user.id}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-red-600/90 hover:bg-red-700 text-white transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        {deletingUserId === user.id ? (
+                          <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
+                        <span>Bekreft</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setDeleteConfirmId(user.id)}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-gray-500 hover:text-red-400 hover:bg-red-950/30 border border-white/5 hover:border-red-500/20 transition-all cursor-pointer"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      <span>Slett</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
