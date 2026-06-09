@@ -759,7 +759,7 @@ export default function MatchesPage() {
     const standings = calculateGroupStandings();
     
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in pb-12">
+      <div className="flex flex-col gap-6 animate-fade-in pb-12 max-w-2xl mx-auto w-full">
         {Object.keys(standings).map((groupName) => (
           <div key={groupName} className="glass-panel-light rounded-2xl border border-white/5 overflow-hidden flex flex-col">
             <div className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
