@@ -15,14 +15,25 @@ export async function POST(request: Request) {
     const { name, email } = await request.json();
 
     if (!name || !email) {
-      return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+      return NextResponse.json({ error: 'Navn og e-post er påkrevd' }, { status: 400 });
     }
 
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
 
     if (!trimmedName || !trimmedEmail) {
-      return NextResponse.json({ error: 'Name and email cannot be empty' }, { status: 400 });
+      return NextResponse.json({ error: 'Navn og e-post kan ikke være tomme' }, { status: 400 });
+    }
+
+    // Check email domain against allowed list
+    const allowedDomainsEnv = process.env.ALLOWED_DOMAINS || 'involve.no,profileringsartikler.no';
+    const allowedDomains = allowedDomainsEnv.split(',').map((d) => d.trim().toLowerCase());
+    const emailDomain = trimmedEmail.split('@')[1];
+
+    if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+      return NextResponse.json({
+        error: `Kun ansatte med e-post fra ${allowedDomains.join(' eller ')} kan delta.`,
+      }, { status: 403 });
     }
 
     // Check if user exists or register them
