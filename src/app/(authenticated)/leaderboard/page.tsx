@@ -298,8 +298,8 @@ export default function LeaderboardPage() {
                             {isLocked ? (
                               <span className="text-red-400 font-semibold uppercase tracking-wider text-[9px]">Låst</span>
                             ) : (
-                              <span className="text-amber-400 flex items-center gap-0.5 uppercase tracking-wider text-[9px]">
-                                <Lock className="h-3 w-3" /> Skjult tips
+                              <span className="text-green-400 font-semibold uppercase tracking-wider text-[9px]">
+                                Åpent tips
                               </span>
                             )}
                           </div>

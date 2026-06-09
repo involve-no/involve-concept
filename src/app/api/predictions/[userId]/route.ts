@@ -41,21 +41,15 @@ export async function GET(
       const prediction = predictionMap.get(match.id);
       const isLocked = now >= new Date(match.date);
 
-      // Security check: Only show predictions for matches that are already locked
+      // Return the prediction data regardless of whether the match is locked
       let predictionData = null;
       if (prediction) {
-        if (isLocked) {
-          predictionData = {
-            predictedScoreA: prediction.predictedScoreA,
-            predictedScoreB: prediction.predictedScoreB,
-            predictedWinner: prediction.predictedWinner,
-            points: prediction.points,
-          };
-        } else {
-          predictionData = {
-            isHidden: true,
-          };
-        }
+        predictionData = {
+          predictedScoreA: prediction.predictedScoreA,
+          predictedScoreB: prediction.predictedScoreB,
+          predictedWinner: prediction.predictedWinner,
+          points: prediction.points,
+        };
       }
 
       return {
