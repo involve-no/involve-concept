@@ -82,9 +82,19 @@ const calculatePoints = (
   return 1;
 };
 
-export async function POST() {
+export async function POST(request: Request) {
   const session = await getSession();
-  if (!session || !session.isAdmin) {
+  let isAuthorized = !!(session && session.isAdmin);
+
+  if (!isAuthorized) {
+    const authHeader = request.headers.get('Authorization');
+    const syncToken = process.env.SYNC_TOKEN;
+    if (syncToken && authHeader === `Bearer ${syncToken}`) {
+      isAuthorized = true;
+    }
+  }
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
