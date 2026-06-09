@@ -1,13 +1,17 @@
 import React from 'react';
+import { countryTranslations } from '@/lib/translations';
 
 const countryToIso: Record<string, string> = {
   'mexico': 'mx',
   'south africa': 'za',
   'rep. of korea': 'kr',
+  'south korea': 'kr',
   'czech rep.': 'cz',
+  'czech republic': 'cz',
   'canada': 'ca',
   'bosnia/herzeg.': 'ba',
   'usa': 'us',
+  'united states': 'us',
   'paraguay': 'py',
   'haiti': 'ht',
   'scotland': 'gb-sct',
@@ -28,6 +32,7 @@ const countryToIso: Record<string, string> = {
   'uruguay': 'uy',
   'cape verde': 'cv',
   'ir iran': 'ir',
+  'iran': 'ir',
   'new zealand': 'nz',
   'belgium': 'be',
   'egypt': 'eg',
@@ -44,7 +49,11 @@ const countryToIso: Record<string, string> = {
   'portugal': 'pt',
   'dr congo': 'cd',
   'uzbekistan': 'uz',
-  'colombia': 'co'
+  'colombia': 'co',
+  'spain': 'es',
+  'austria': 'at',
+  'ecuador': 'ec',
+  'senegal': 'sn'
 };
 
 interface CountryFlagProps {
@@ -54,7 +63,17 @@ interface CountryFlagProps {
 
 export default function CountryFlag({ countryName, className = 'w-10 h-10' }: CountryFlagProps) {
   const normalized = countryName.trim().toLowerCase();
-  const isoCode = countryToIso[normalized];
+  let isoCode = countryToIso[normalized];
+
+  if (!isoCode) {
+    // Try finding the English key for this Norwegian name
+    const englishKey = Object.keys(countryTranslations).find(
+      key => countryTranslations[key].toLowerCase() === normalized
+    );
+    if (englishKey) {
+      isoCode = countryToIso[englishKey];
+    }
+  }
 
   if (!isoCode) {
     // Soccer ball placeholder for knockout brackets or TBD

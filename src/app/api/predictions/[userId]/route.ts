@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/session';
+import { translateTeam } from '@/lib/translations';
 
 export async function GET(
   request: Request,
@@ -60,8 +61,8 @@ export async function GET(
       return {
         id: match.id,
         description: match.description,
-        teamA: match.teamA,
-        teamB: match.teamB,
+        teamA: translateTeam(match.teamA),
+        teamB: translateTeam(match.teamB),
         date: match.date,
         stadium: match.stadium,
         status: match.status,
