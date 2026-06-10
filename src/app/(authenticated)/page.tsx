@@ -103,7 +103,17 @@ export default function MatchesPage() {
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<{ id: number; name: string; email: string } | null>(null);
   const [showFinished, setShowFinished] = useState(false);
-  const [activeTab, setActiveTab] = useState<'matches' | 'standings'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'podium'>('matches');
+  
+  // Podium states
+  const [podiumTeams, setPodiumTeams] = useState<string[]>([]);
+  const [podiumGold, setPodiumGold] = useState('');
+  const [podiumSilver, setPodiumSilver] = useState('');
+  const [podiumBronze, setPodiumBronze] = useState('');
+  const [podiumLocked, setPodiumLocked] = useState(false);
+  const [podiumSaving, setPodiumSaving] = useState(false);
+  const [podiumSuccess, setPodiumSuccess] = useState(false);
+  const [otherPodiums, setOtherPodiums] = useState<{ userId: number; userName: string; goldTeam: string; silverTeam: string; bronzeTeam: string }[]>([]);
   
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,8 +157,70 @@ export default function MatchesPage() {
     }
   };
 
+  const fetchPodium = async () => {
+    try {
+      const res = await fetch('/api/predictions/podium');
+      if (res.ok) {
+        const data = await res.json();
+        setPodiumTeams(data.teams);
+        setPodiumLocked(data.isLocked);
+        if (data.prediction) {
+          setPodiumGold(data.prediction.goldTeam || '');
+          setPodiumSilver(data.prediction.silverTeam || '');
+          setPodiumBronze(data.prediction.bronzeTeam || '');
+        }
+        if (data.otherUsersPicks) {
+          setOtherPodiums(data.otherUsersPicks);
+        }
+      }
+    } catch (err) {
+      console.error('Klarte ikke å hente vinnertips:', err);
+    }
+  };
+
+  const handleSavePodium = async () => {
+    if (!podiumGold || !podiumSilver || !podiumBronze) {
+      setError('Du må velge både gull, sølv og bronse');
+      return;
+    }
+
+    if (podiumGold === podiumSilver || podiumGold === podiumBronze || podiumSilver === podiumBronze) {
+      setError('Du kan ikke velge samme land til flere plasseringer');
+      return;
+    }
+
+    setPodiumSaving(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/predictions/podium', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goldTeam: podiumGold,
+          silverTeam: podiumSilver,
+          bronzeTeam: podiumBronze,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Kunne ikke lagre vinnertips');
+      }
+
+      setPodiumSuccess(true);
+      setTimeout(() => setPodiumSuccess(false), 2500);
+      await fetchPodium();
+    } catch (err: any) {
+      setError(err.message || 'Noe gikk galt under lagring av vinnertips');
+    } finally {
+      setPodiumSaving(false);
+    }
+  };
+
   useEffect(() => {
     fetchMatches();
+    fetchPodium();
 
     // Fetch user details
     fetch('/api/auth')
@@ -821,6 +893,174 @@ export default function MatchesPage() {
     );
   };
 
+  const renderPodiumTab = () => {
+    return (
+      <div className="space-y-6 animate-fade-in max-w-2xl mx-auto w-full pb-12">
+        <div className="glass-panel-light rounded-2xl p-5 border border-white/5 space-y-4">
+          <div className="flex justify-between items-center border-b border-white/5 pb-3">
+            <div>
+              <h3 className="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
+                🏆 Vinnertips (Sluttplassering)
+              </h3>
+              <span className="text-[10px] text-gray-500 uppercase tracking-widest block mt-0.5">
+                Tipp 1., 2. og 3. plass i VM 2026. Låses ved første kampstart.
+              </span>
+            </div>
+            {podiumLocked ? (
+              <span className="bg-red-500/20 text-red-300 border border-red-500/30 px-2.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider">
+                Låst
+              </span>
+            ) : (
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider animate-pulse-slow">
+                Åpen
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-4 pt-1">
+            {/* Gold */}
+            <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-2xl select-none">🥇</span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-black text-yellow-400 uppercase tracking-wider">1. Plass (Gull)</span>
+                  <span className="text-[10px] text-gray-500">Verdensmester</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {podiumGold && <CountryFlag countryName={podiumGold} className="w-6 h-6 shrink-0" />}
+                <select
+                  value={podiumGold}
+                  disabled={podiumLocked}
+                  onChange={(e) => setPodiumGold(e.target.value)}
+                  className="glass-input text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-900 border-white/10 w-44 text-white"
+                >
+                  <option value="">Velg lag...</option>
+                  {podiumTeams.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Silver */}
+            <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-300/5 border border-slate-300/10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-2xl select-none">🥈</span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-black text-slate-300 uppercase tracking-wider">2. Plass (Sølv)</span>
+                  <span className="text-[10px] text-gray-500">Tapende finalist</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {podiumSilver && <CountryFlag countryName={podiumSilver} className="w-6 h-6 shrink-0" />}
+                <select
+                  value={podiumSilver}
+                  disabled={podiumLocked}
+                  onChange={(e) => setPodiumSilver(e.target.value)}
+                  className="glass-input text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-900 border-white/10 w-44 text-white"
+                >
+                  <option value="">Velg lag...</option>
+                  {podiumTeams.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Bronze */}
+            <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-amber-600/5 border border-amber-600/10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-2xl select-none">🥉</span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-black text-amber-500 uppercase tracking-wider">3. Plass (Bronse)</span>
+                  <span className="text-[10px] text-gray-500">Vinner av bronsefinalen</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {podiumBronze && <CountryFlag countryName={podiumBronze} className="w-6 h-6 shrink-0" />}
+                <select
+                  value={podiumBronze}
+                  disabled={podiumLocked}
+                  onChange={(e) => setPodiumBronze(e.target.value)}
+                  className="glass-input text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-900 border-white/10 w-44 text-white"
+                >
+                  <option value="">Velg lag...</option>
+                  {podiumTeams.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {!podiumLocked && (
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={handleSavePodium}
+                disabled={podiumSaving || !podiumGold || !podiumSilver || !podiumBronze}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+              >
+                {podiumSaving ? (
+                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : podiumSuccess ? (
+                  <>
+                    <CheckCircle className="h-3.5 w-3.5 animate-bounce" />
+                    <span>Lagret</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-3.5 w-3.5" />
+                    <span>Lagre vinnertips</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Other Users Picks List */}
+        {podiumLocked && (
+          <div className="glass-panel-light rounded-2xl p-5 border border-white/5 space-y-4">
+            <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">
+              Hva har kollegaene dine tippet?
+            </h3>
+            
+            <div className="space-y-3">
+              {otherPodiums.length === 0 ? (
+                <p className="text-xs text-gray-500 text-center py-4">Ingen andre har registrert vinnertips.</p>
+              ) : (
+                otherPodiums.map(p => (
+                  <div key={p.userId} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <UserAvatar name={p.userName} className="w-7 h-7 text-[10px] font-bold" />
+                      <span className="text-xs font-bold text-white truncate max-w-[120px]" title={p.userName}>{p.userName}</span>
+                    </div>
+
+                    <div className="flex gap-1.5 shrink-0 text-[10px] font-bold">
+                      <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded text-yellow-400 animate-pulse-slow">
+                        <span>🥇</span>
+                        <span>{p.goldTeam}</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-slate-300/10 border border-slate-300/20 px-2 py-0.5 rounded text-slate-300">
+                        <span>🥈</span>
+                        <span>{p.silverTeam}</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-amber-600/10 border border-amber-600/20 px-2 py-0.5 rounded text-amber-500">
+                        <span>🥉</span>
+                        <span>{p.bronzeTeam}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
@@ -901,9 +1141,19 @@ export default function MatchesPage() {
         >
           📊 Gruppetabeller
         </button>
+        <button
+          onClick={() => setActiveTab('podium')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'podium'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          🏆 Vinner-tips
+        </button>
       </div>
 
-      {activeTab === 'matches' ? (
+      {activeTab === 'matches' && (
         <>
           {/* Search & Filter Controls */}
       <div className="space-y-3 glass-panel-light p-3.5 rounded-xl border border-white/5">
@@ -1013,9 +1263,11 @@ export default function MatchesPage() {
         </div>
       )}
       </>
-      ) : (
-        renderStandingsSimulator()
       )}
+
+      {activeTab === 'standings' && renderStandingsSimulator()}
+
+      {activeTab === 'podium' && renderPodiumTab()}
 
       {/* Rules Modal */}
       {showRules && (
@@ -1097,6 +1349,30 @@ export default function MatchesPage() {
                     <div className="flex items-start gap-2">
                       <span className="mt-0.5 px-2 py-0.5 rounded bg-gray-500/20 text-gray-400 border border-gray-500/20 font-bold text-[10px] shrink-0">0p</span>
                       <span>Feil lag videre</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Podium Rules */}
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-wider text-yellow-400 mb-2">🏆 Vinnertips (Verdensmester)</h4>
+                <div className="bg-yellow-500/5 border border-yellow-500/20 p-3 rounded-xl space-y-2 text-xs text-gray-300">
+                  <p>
+                    Tipp hvilke land som tar 1., 2. og 3. plass i mesterskapet. Tipsene må sendes inn før den aller første kampen i turneringen starter.
+                  </p>
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/20 font-bold text-[10px] shrink-0">100p</span>
+                      <span>Alle 3 riktige (gull, sølv og bronse på nøyaktig riktig plass)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/20 font-bold text-[10px] shrink-0">50p</span>
+                      <span>2 av 3 riktige plasseringer</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 px-2 py-0.5 rounded bg-gray-500/20 text-gray-400 border border-gray-500/20 font-bold text-[10px] shrink-0">25p</span>
+                      <span>1 av 3 riktige plasseringer</span>
                     </div>
                   </div>
                 </div>

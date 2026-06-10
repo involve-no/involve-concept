@@ -56,6 +56,21 @@ db.exec(`
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (matchId) REFERENCES matches(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS podium_predictions (
+    userId INTEGER PRIMARY KEY,
+    goldTeam TEXT DEFAULT NULL,
+    silverTeam TEXT DEFAULT NULL,
+    bronzeTeam TEXT DEFAULT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS podium_results (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    goldTeam TEXT DEFAULT NULL,
+    silverTeam TEXT DEFAULT NULL,
+    bronzeTeam TEXT DEFAULT NULL
+  );
 `);
 
 // Safely alter existing database tables for backward compatibility

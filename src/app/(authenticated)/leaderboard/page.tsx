@@ -44,6 +44,7 @@ export default function LeaderboardPage() {
   // Drilldown Modal states
   const [selectedUser, setSelectedUser] = useState<{ id: number; name: string } | null>(null);
   const [userPredictions, setUserPredictions] = useState<UserPrediction[]>([]);
+  const [selectedUserPodium, setSelectedUserPodium] = useState<{ goldTeam: string; silverTeam: string; bronzeTeam: string } | null>(null);
   const [loadingPredictions, setLoadingPredictions] = useState(false);
   const [predictionsError, setPredictionsError] = useState('');
 
@@ -81,12 +82,16 @@ export default function LeaderboardPage() {
     setLoadingPredictions(true);
     setPredictionsError('');
     setUserPredictions([]);
+    setSelectedUserPodium(null);
 
     try {
       const res = await fetch(`/api/predictions/${user.id}`);
       if (!res.ok) throw new Error('Klarte ikke å hente tipsene for brukeren');
       const data = await res.json();
       setUserPredictions(data.matches);
+      if (data.podiumPrediction) {
+        setSelectedUserPodium(data.podiumPrediction);
+      }
     } catch (err: any) {
       setPredictionsError(err.message || 'Klarte ikke å hente tipsene');
     } finally {
@@ -270,12 +275,34 @@ export default function LeaderboardPage() {
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{predictionsError}</span>
                 </div>
-              ) : userPredictions.filter(p => !!p.prediction).length === 0 ? (
-                <div className="text-center py-12 text-xs text-gray-500">
-                  Ingen tips lagret av denne brukeren ennå.
-                </div>
               ) : (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
+                  {selectedUserPodium && (
+                    <div className="glass-panel-light rounded-xl p-3 border border-white/5 space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-wider text-amber-400">🏆 Vinnertips</h4>
+                      <div className="grid grid-cols-3 gap-1.5 text-[10px] font-black">
+                        <div className="flex flex-col items-center bg-yellow-500/10 border border-yellow-500/20 py-1.5 rounded text-yellow-400 gap-1">
+                          <span>🥇 Gull</span>
+                          <span className="truncate text-white font-bold w-full text-center px-1" title={selectedUserPodium.goldTeam}>{selectedUserPodium.goldTeam || 'Ikke valgt'}</span>
+                        </div>
+                        <div className="flex flex-col items-center bg-slate-300/10 border border-slate-300/20 py-1.5 rounded text-slate-300 gap-1">
+                          <span>🥈 Sølv</span>
+                          <span className="truncate text-white font-bold w-full text-center px-1" title={selectedUserPodium.silverTeam}>{selectedUserPodium.silverTeam || 'Ikke valgt'}</span>
+                        </div>
+                        <div className="flex flex-col items-center bg-amber-600/10 border border-amber-600/20 py-1.5 rounded text-amber-500 gap-1">
+                          <span>🥉 Bronse</span>
+                          <span className="truncate text-white font-bold w-full text-center px-1" title={selectedUserPodium.bronzeTeam}>{selectedUserPodium.bronzeTeam || 'Ikke valgt'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {userPredictions.filter(p => !!p.prediction).length === 0 ? (
+                    <div className="text-center py-8 text-xs text-gray-500">
+                      Ingen kamp-tips lagret av denne brukeren ennå.
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
                   {userPredictions
                     .filter((m) => !!m.prediction)
                     .map((m) => {
@@ -373,11 +400,13 @@ export default function LeaderboardPage() {
                         </div>
                       );
                     })}
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
+      )}
+      </div>
+      </div>
+      </div>
       )}
     </div>
   );

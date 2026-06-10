@@ -20,10 +20,45 @@ export async function GET() {
       FROM users u
       LEFT JOIN predictions p ON u.id = p.userId
       GROUP BY u.id
-      ORDER BY totalPoints DESC, exactMatches DESC, u.name ASC
     `).all() as any[];
 
-    return NextResponse.json({ leaderboard });
+    // Fetch podium results and predictions to add winner points dynamically
+    const results = db.prepare('SELECT goldTeam, silverTeam, bronzeTeam FROM podium_results WHERE id = 1').get() as { goldTeam: string; silverTeam: string; bronzeTeam: string } | undefined;
+    const hasResults = results && results.goldTeam && results.silverTeam && results.bronzeTeam;
+
+    const podiumPredictions = db.prepare('SELECT userId, goldTeam, silverTeam, bronzeTeam FROM podium_predictions').all() as { userId: number; goldTeam: string; silverTeam: string; bronzeTeam: string }[];
+    const podiumMap = new Map(podiumPredictions.map(p => [p.userId, p]));
+
+    const computedLeaderboard = leaderboard.map(user => {
+      let podiumPoints = 0;
+      const pred = podiumMap.get(user.id);
+      
+      if (hasResults && pred) {
+        let correctCount = 0;
+        if (pred.goldTeam === results.goldTeam) correctCount++;
+        if (pred.silverTeam === results.silverTeam) correctCount++;
+        if (pred.bronzeTeam === results.bronzeTeam) correctCount++;
+
+        if (correctCount === 3) podiumPoints = 100;
+        else if (correctCount === 2) podiumPoints = 50;
+        else if (correctCount === 1) podiumPoints = 25;
+      }
+
+      return {
+        ...user,
+        totalPoints: user.totalPoints + podiumPoints,
+        podiumPoints // Expose it separately in case we want to show it in user details
+      };
+    });
+
+    // Re-sort leaderboard by totalPoints DESC, exactMatches DESC, name ASC
+    computedLeaderboard.sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      if (b.exactMatches !== a.exactMatches) return b.exactMatches - a.exactMatches;
+      return a.name.localeCompare(b.name);
+    });
+
+    return NextResponse.json({ leaderboard: computedLeaderboard });
   } catch (error) {
     console.error('Leaderboard GET Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

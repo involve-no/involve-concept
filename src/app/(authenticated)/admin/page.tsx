@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, AlertCircle, Save, CheckCircle, RotateCcw, Calendar, Search, RefreshCw, Users, Trash2 } from 'lucide-react';
+import { Shield, AlertCircle, Save, CheckCircle, RotateCcw, Calendar, Search, RefreshCw, Users, Trash2, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/CountryFlag';
 import UserAvatar from '@/components/UserAvatar';
 
@@ -51,6 +51,14 @@ export default function AdminPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
   const [userError, setUserError] = useState('');
+
+  // Podium admin states
+  const [podiumTeams, setPodiumTeams] = useState<string[]>([]);
+  const [podiumGold, setPodiumGold] = useState('');
+  const [podiumSilver, setPodiumSilver] = useState('');
+  const [podiumBronze, setPodiumBronze] = useState('');
+  const [podiumSaving, setPodiumSaving] = useState(false);
+  const [podiumSuccess, setPodiumSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -145,9 +153,64 @@ export default function AdminPage() {
     }
   };
 
+  const fetchPodiumResults = async () => {
+    try {
+      const res = await fetch('/api/admin/podium');
+      if (res.ok) {
+        const data = await res.json();
+        setPodiumTeams(data.teams || []);
+        if (data.results) {
+          setPodiumGold(data.results.goldTeam || '');
+          setPodiumSilver(data.results.silverTeam || '');
+          setPodiumBronze(data.results.bronzeTeam || '');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch podium results:', err);
+    }
+  };
+
+  const handleSavePodiumResults = async () => {
+    if ((podiumGold && podiumSilver && podiumGold === podiumSilver) || 
+        (podiumGold && podiumBronze && podiumGold === podiumBronze) || 
+        (podiumSilver && podiumBronze && podiumSilver === podiumBronze)) {
+      setError('Du kan ikke velge samme land til flere plasseringer');
+      return;
+    }
+
+    setPodiumSaving(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin/podium', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goldTeam: podiumGold || null,
+          silverTeam: podiumSilver || null,
+          bronzeTeam: podiumBronze || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Kunne ikke lagre vinner-resultat');
+      }
+
+      setPodiumSuccess(true);
+      setTimeout(() => setPodiumSuccess(false), 2500);
+      await fetchPodiumResults();
+    } catch (err: any) {
+      setError(err.message || 'Noe gikk galt under lagring av vinner-resultat');
+    } finally {
+      setPodiumSaving(false);
+    }
+  };
+
   useEffect(() => {
     verifyAdminAndFetchMatches();
     fetchUsers();
+    fetchPodiumResults();
   }, []);
 
   const handleScoreChange = (matchId: string, team: 'a' | 'b' | 'pa' | 'pb', val: string) => {
@@ -399,6 +462,115 @@ export default function AdminPage() {
           <span>{syncMessage}</span>
         </div>
       )}
+
+      {/* Podium Results Config Section */}
+      <div className="glass-panel-light rounded-2xl p-5 border border-white/5 space-y-4">
+        <div>
+          <h3 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-yellow-400" />
+            <span>Offisielt Vinner-resultat (Podium)</span>
+          </h3>
+          <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-widest mt-0.5">
+            Angi de tre beste landene for å beregne poeng til vinnertipsene
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Gold */}
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+            <span className="text-[10px] font-black text-yellow-400 uppercase tracking-wider">🥇 1. Plass (Gull)</span>
+            <div className="flex items-center gap-2">
+              {podiumGold && <CountryFlag countryName={podiumGold} className="w-5 h-5 shrink-0" />}
+              <select
+                id="admin-podium-gold"
+                value={podiumGold}
+                onChange={(e) => setPodiumGold(e.target.value)}
+                className="glass-input text-xs font-bold px-2.5 py-1.5 rounded-lg bg-gray-900 border-white/10 w-full text-white"
+              >
+                <option value="">Velg land...</option>
+                {podiumTeams.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Silver */}
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-300/5 border border-slate-300/10">
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-wider">🥈 2. Plass (Sølv)</span>
+            <div className="flex items-center gap-2">
+              {podiumSilver && <CountryFlag countryName={podiumSilver} className="w-5 h-5 shrink-0" />}
+              <select
+                id="admin-podium-silver"
+                value={podiumSilver}
+                onChange={(e) => setPodiumSilver(e.target.value)}
+                className="glass-input text-xs font-bold px-2.5 py-1.5 rounded-lg bg-gray-900 border-white/10 w-full text-white"
+              >
+                <option value="">Velg land...</option>
+                {podiumTeams.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Bronze */}
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-amber-600/5 border border-amber-600/10">
+            <span className="text-[10px] font-black text-amber-500 uppercase tracking-wider">🥉 3. Plass (Bronse)</span>
+            <div className="flex items-center gap-2">
+              {podiumBronze && <CountryFlag countryName={podiumBronze} className="w-5 h-5 shrink-0" />}
+              <select
+                id="admin-podium-bronze"
+                value={podiumBronze}
+                onChange={(e) => setPodiumBronze(e.target.value)}
+                className="glass-input text-xs font-bold px-2.5 py-1.5 rounded-lg bg-gray-900 border-white/10 w-full text-white"
+              >
+                <option value="">Velg land...</option>
+                {podiumTeams.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-1">
+          {(podiumGold || podiumSilver || podiumBronze) && (
+            <button
+              id="admin-podium-reset-btn"
+              onClick={() => {
+                setPodiumGold('');
+                setPodiumSilver('');
+                setPodiumBronze('');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white text-gray-300 transition-all cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Tøm valg</span>
+            </button>
+          )}
+          <button
+            id="admin-podium-save-btn"
+            onClick={handleSavePodiumResults}
+            disabled={podiumSaving}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shadow-md"
+          >
+            {podiumSaving ? (
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : podiumSuccess ? (
+              <>
+                <CheckCircle className="h-3.5 w-3.5 animate-bounce" />
+                <span>Lagret</span>
+              </>
+            ) : (
+              <>
+                <Save className="h-3.5 w-3.5" />
+                <span>Lagre resultat</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* Grouped Match List */}
       {sortedDates.length === 0 ? (

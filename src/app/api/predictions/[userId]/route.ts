@@ -69,9 +69,19 @@ export async function GET(
       };
     });
 
+    const firstMatch = db.prepare('SELECT date FROM matches ORDER BY date ASC LIMIT 1').get() as { date: string } | undefined;
+    const isLockedFirstMatch = firstMatch ? new Date() >= new Date(firstMatch.date) : false;
+    const isSelf = session.id === targetUserId;
+
+    let podiumPrediction = null;
+    if (isSelf || isLockedFirstMatch) {
+      podiumPrediction = db.prepare('SELECT goldTeam, silverTeam, bronzeTeam FROM podium_predictions WHERE userId = ?').get(targetUserId) as { goldTeam: string; silverTeam: string; bronzeTeam: string } | undefined;
+    }
+
     return NextResponse.json({ 
       userName: targetUser.name, 
-      matches: matchesWithPredictions 
+      matches: matchesWithPredictions,
+      podiumPrediction: podiumPrediction || null
     });
   } catch (error) {
     console.error('Predictions for user GET Error:', error);
