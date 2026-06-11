@@ -900,7 +900,7 @@ export default function MatchesPage() {
           <div className="flex justify-between items-center border-b border-white/5 pb-3">
             <div>
               <h3 className="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
-                🏆 Vinnertips (Sluttplassering)
+                🏆 Topp 3 (Sluttplassering)
               </h3>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest block mt-0.5">
                 Tipp 1., 2. og 3. plass i VM 2026. Låses ved første kampstart.
@@ -1011,7 +1011,7 @@ export default function MatchesPage() {
                 ) : (
                   <>
                     <Save className="h-3.5 w-3.5" />
-                    <span>Lagre vinnertips</span>
+                    <span>Lagre tips (Topp 3)</span>
                   </>
                 )}
               </button>
@@ -1149,7 +1149,7 @@ export default function MatchesPage() {
               : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          🏆 Vinner-tips
+          🏆 Topp 3
         </button>
       </div>
 
