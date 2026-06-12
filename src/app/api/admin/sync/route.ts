@@ -166,14 +166,14 @@ export async function POST(request: Request) {
           }
         }
 
-        const hasScore = ofM.score1 !== undefined && ofM.score2 !== undefined;
+        const hasScore = ofM.score && ofM.score.ft && ofM.score.ft.length === 2;
         if (hasScore) {
-          const actA = parseInt(ofM.score1, 10);
-          const actB = parseInt(ofM.score2, 10);
-          const actPA = ofM.score1p !== undefined ? parseInt(ofM.score1p, 10) : null;
-          const actPB = ofM.score2p !== undefined ? parseInt(ofM.score2p, 10) : null;
+          const actA = ofM.score.ft[0];
+          const actB = ofM.score.ft[1];
+          const actPA = (ofM.score.ps && ofM.score.ps.length === 2) ? ofM.score.ps[0] : null;
+          const actPB = (ofM.score.ps && ofM.score.ps.length === 2) ? ofM.score.ps[1] : null;
 
-          if (!isNaN(actA) && !isNaN(actB)) {
+          if (actA !== null && actA !== undefined && actB !== null && actB !== undefined && !isNaN(actA) && !isNaN(actB)) {
             // Update score if match is not finished, or score/penalties/teams changed
             if (
               dbMatch.status !== 'finished' || 
