@@ -10,6 +10,30 @@ const excelDateToJS = (serial: number) => {
   return new Date((utcValue + timeValue) * 1000);
 };
 
+const localOsloToUTC = (year: number, month: number, date: number, hours: number, minutes: number) => {
+  const tempUTC = new Date(Date.UTC(year, month, date, hours, minutes));
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Oslo',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false
+  });
+  const parts = formatter.formatToParts(tempUTC);
+  const getVal = (type: string) => parseInt(parts.find(p => p.type === type)!.value, 10);
+  const oYear = getVal('year');
+  const oMonth = getVal('month') - 1;
+  const oDay = getVal('day');
+  let oHour = getVal('hour');
+  if (oHour === 24) oHour = 0;
+  const oMin = getVal('minute');
+  const oUTC = new Date(Date.UTC(oYear, oMonth, oDay, oHour, oMin));
+  const diffMs = oUTC.getTime() - tempUTC.getTime();
+  return new Date(tempUTC.getTime() - diffMs);
+};
+
 function updateMatches() {
   console.log('Syncing match teams and kick-off times from Excel...');
 
@@ -43,8 +67,15 @@ function updateMatches() {
 
       if (typeof matchNum === 'number' && matchNum >= 1 && matchNum <= 104 && typeof dateSerial === 'number') {
         const matchId = `M${matchNum.toString().padStart(3, '0')}`;
-        const kickoffDate = excelDateToJS(dateSerial);
-        const dateIsoStr = kickoffDate.toISOString(); // E.g., '2026-06-11T21:00:00.000Z'
+        const tempDate = excelDateToJS(dateSerial);
+        const kickoffDate = localOsloToUTC(
+          tempDate.getUTCFullYear(),
+          tempDate.getUTCMonth(),
+          tempDate.getUTCDate(),
+          tempDate.getUTCHours(),
+          tempDate.getUTCMinutes()
+        );
+        const dateIsoStr = kickoffDate.toISOString(); // Correct UTC timestamp
 
         if (matchNum <= 72) {
           const teamA = row[8];
