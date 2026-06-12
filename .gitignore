@@ -41,4 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # SQLite database (persisted on server, never committed to git)
-/data/*.db
+/data/
