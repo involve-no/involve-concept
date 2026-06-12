@@ -9,6 +9,45 @@ export async function GET() {
   }
 
   try {
+    // Self-healing check: calculate points for any predictions that are missing points but the match is finished
+    const uncalculated = db.prepare(`
+      SELECT p.userId, p.matchId, p.predictedScoreA, p.predictedScoreB, p.predictedWinner,
+             m.scoreA, m.scoreB, m.penaltyScoreA, m.penaltyScoreB
+      FROM predictions p
+      JOIN matches m ON p.matchId = m.id
+      WHERE p.points IS NULL AND m.status = 'finished'
+    `).all() as any[];
+
+    if (uncalculated.length > 0) {
+      const updatePoints = db.prepare('UPDATE predictions SET points = ? WHERE userId = ? AND matchId = ?');
+      db.transaction(() => {
+        for (const p of uncalculated) {
+          let actualWinner = 0;
+          if (p.scoreA > p.scoreB) actualWinner = 1;
+          else if (p.scoreA < p.scoreB) actualWinner = -1;
+          else if (p.penaltyScoreA !== null && p.penaltyScoreB !== null) {
+            actualWinner = p.penaltyScoreA > p.penaltyScoreB ? 1 : -1;
+          }
+
+          let predictedWinner = 0;
+          if (p.predictedScoreA > p.predictedScoreB) predictedWinner = 1;
+          else if (p.predictedScoreA < p.predictedScoreB) predictedWinner = -1;
+          else if (p.predictedWinner === 'teamA') predictedWinner = 1;
+          else if (p.predictedWinner === 'teamB') predictedWinner = -1;
+
+          let points = 0;
+          if (predictedWinner === actualWinner) {
+            if (p.predictedScoreA === p.scoreA && p.predictedScoreB === p.scoreB) {
+              points = 3;
+            } else {
+              points = 1;
+            }
+          }
+          updatePoints.run(points, p.userId, p.matchId);
+        }
+      })();
+    }
+
     const leaderboard = db.prepare(`
       SELECT 
         u.id, 
