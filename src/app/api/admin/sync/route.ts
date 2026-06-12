@@ -82,6 +82,8 @@ const calculatePoints = (
   return 1;
 };
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const session = await getSession();
   let isAuthorized = !!(session && session.isAdmin);
@@ -100,7 +102,7 @@ export async function POST(request: Request) {
 
   try {
     const ofUrl = 'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json';
-    const response = await fetch(ofUrl);
+    const response = await fetch(ofUrl, { cache: 'no-store' });
     
     if (!response.ok) {
       return NextResponse.json({ error: `Klarte ikke å hente data fra openfootball (Status: ${response.status})` }, { status: 502 });
