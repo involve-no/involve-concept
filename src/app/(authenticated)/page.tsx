@@ -763,24 +763,11 @@ export default function MatchesPage() {
       const groupName = m.description.replace('Group ', '').trim();
       if (!groups.includes(groupName)) return;
 
-      let scoreA: number | null = null;
-      let scoreB: number | null = null;
-
       if (m.status === 'finished') {
-        scoreA = m.scoreA;
-        scoreB = m.scoreB;
-      } else {
-        const draft = draftScores[m.id];
-        if (draft && draft.a !== '' && draft.b !== '') {
-          scoreA = parseInt(draft.a, 10);
-          scoreB = parseInt(draft.b, 10);
-        } else if (m.prediction) {
-          scoreA = m.prediction.predictedScoreA;
-          scoreB = m.prediction.predictedScoreB;
-        }
-      }
+        const scoreA = m.scoreA;
+        const scoreB = m.scoreB;
 
-      if (scoreA !== null && scoreB !== null && !isNaN(scoreA) && !isNaN(scoreB)) {
+        if (scoreA !== null && scoreB !== null && !isNaN(scoreA) && !isNaN(scoreB)) {
         const teamA = m.teamA;
         const teamB = m.teamB;
 
@@ -812,6 +799,7 @@ export default function MatchesPage() {
           standings[groupName][teamB].gd = standings[groupName][teamB].gf - standings[groupName][teamB].ga;
         }
       }
+      }
     });
 
     const sortedStandings: Record<string, typeof standings[string][string][]> = {};
@@ -836,7 +824,7 @@ export default function MatchesPage() {
           <div key={groupName} className="glass-panel-light rounded-2xl border border-white/5 overflow-hidden flex flex-col">
             <div className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
               <span className="font-black text-white text-xs uppercase tracking-wider">Gruppe {groupName}</span>
-              <span className="text-[10px] text-gray-400 font-semibold">Simulert tabell</span>
+              <span className="text-[10px] text-gray-400 font-semibold">Offisiell tabell</span>
             </div>
             
             <div className="p-3 overflow-x-auto">
