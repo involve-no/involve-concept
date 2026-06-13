@@ -1127,7 +1127,7 @@ export default function MatchesPage() {
               : 'text-gray-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          📊 Gruppetabeller
+          📊 Gruppespill
         </button>
         <button
           onClick={() => setActiveTab('podium')}
