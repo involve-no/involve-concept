@@ -305,6 +305,16 @@ export default function LeaderboardPage() {
                     <div className="space-y-2.5">
                   {userPredictions
                     .filter((m) => !!m.prediction)
+                    .sort((a, b) => {
+                      const aFinished = a.status === 'finished';
+                      const bFinished = b.status === 'finished';
+                      // Unfinished matches go to the top, finished to the bottom
+                      if (aFinished !== bFinished) return aFinished ? 1 : -1;
+                      // If both are unfinished, sort chronologically (soonest first)
+                      if (!aFinished) return new Date(a.date).getTime() - new Date(b.date).getTime();
+                      // If both are finished, sort reverse-chronologically (latest finished first)
+                      return new Date(b.date).getTime() - new Date(a.date).getTime();
+                    })
                     .map((m) => {
                       const pred = m.prediction!;
                       const isLocked = m.isLocked;
