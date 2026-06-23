@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CaseCard from '../../components/CaseCard.astro';
+
+const allCases = [
+  {
+    title: 'Trend & Tradisjon 2026',
+    category: 'Design & Identitet',
+    description: 'Utvikling av et helt nytt visuelt konsept og profilering for bransjetreffet Trend & Tradisjon 2026 på vegne av New Wave.',
+    image: 'https://involve.no/wp-content/uploads/2026/02/Presentasjon_Schweppes-OOH_4_Side_6.jpg',
+    href: '/prosjekter/example-project'
+  },
+  {
+    title: 'Gul jul med Schweppes',
+    category: 'Reklame & Markedsføring',
+    description: 'Noen ganger er det mest effektive å stå støtt når alle andre skrur opp volumet. I et ellers julemettet bybilde valgte Schweppes å stå støtt i det de allerede eier, og gjorde heller julen gul.',
+    image: 'https://involve.no/wp-content/uploads/2026/02/Presentasjon_Schweppes-OOH_4_Side_6.jpg',
+    href: '/prosjekter/schweppes'
+  },
+  {
+    title: 'Salma er tilbake',
+    category: 'Design & Identitet',
+    description: 'SALMA har alltid vært noe mer enn bare laks. Det er en merkevare nordmenn forbinder med kvalitet, stolthet og matglede. Da den forsvant fra markedet i 2024, ble savnet stort – både hos forbrukere, butikker og kokker.',
+    image: 'https://involve.no/wp-content/uploads/2025/11/SALMA-ER-TILBAKE_Hellstrom-ved-disk.avif',
+    href: '/prosjekter/salma'
+  },
+  {
+    title: 'Ragasco. 25 år. 25 millioner historier.',
+    category: 'Komplett Kommunikasjon',
+    description: 'I 2025 markerte gassflaskeprodusenten Ragasco en viktig milepæl – nemlig 25 år. Involve har utviklet og levar den globale jubileumskampanjen på tvers av digitale og fysiske flater.',
+    image: 'https://involve.no/wp-content/uploads/2025/11/Jubileum_jubileumslogo_negativ_1350x1080.png',
+    href: '/prosjekter/ragasco'
+  },
+  {
+    title: 'Kreftforeningen – Din bit gjør en forskjell',
+    category: 'Design & Identitet',
+    description: 'Når du fyller år (eller gifter deg!), får du gjerne gaver du ikke trenger. Samtidig er det mange som ønsker å bruke anledningen til noe mer meningsfullt – som å støtte en god sak.',
+    image: 'https://involve.no/wp-content/uploads/2025/09/Kreftforeningen_fremhevet-bilde_03-scaled.png',
+    href: '/prosjekter/kreftforeningen'
+  },
+  {
+    title: 'Defender Norseman-sponsing',
+    category: 'Design & Identitet',
+    description: 'I august stupte 250 utøvere ut i Hardangerfjorden for å takle Norseman Xtreme Triathlon. De ble etterfulgt av en ny offisiell sponsor: Defender.',
+    image: 'https://involve.no/wp-content/uploads/2025/08/7.avif',
+    href: '/prosjekter/defender'
+  },
+  {
+    title: 'Designjobb for Ringnes',
+    category: 'Design & Identitet',
+    description: 'Vi samarbeider med Ringnes om en rekke forskjellige merkevarer, som for eksempel Farris, Solo, Bris, Frus, Imsdal, samt flere av deres ølprodukter som Frydenlund.',
+    image: 'https://involve.no/wp-content/uploads/2025/08/xCollage_beerlini.png.pagespeed.ic_.ZoY7P0Wgoh-scaled.png',
+    href: '/prosjekter/ringnes'
+  },
+  {
+    title: 'Vertikal Nydalen',
+    category: 'Design & Identitet',
+    description: 'Involve fikk oppgaven med å utvikle navnet Vertikal Nydalen samt skape en helhetlig visuell identitet og grafisk profil for prosjektet.',
+    image: 'https://involve.no/wp-content/uploads/2025/08/Monosnap-Vertikal-Nydalen-oppdatert-skisse-Involve-Advertising-Oslo-2025-09-17-16-03-59.png',
+    href: '/prosjekter/vertikal-nydalen'
+  }
+];
+---
+
+<BaseLayout title="Våre Prosjekter - Involve! Advertising" description="Se våre utvalgte cases og arbeider innen PR, design og reklame.">
+  
+  <!-- Page Header banner -->
+  <section class="bg-[#F9F9F9] border-b border-[#E7E7E7]/40 py-20 px-6 mt-20">
+    <div class="max-w-[1600px] mx-auto">
+      <span class="text-xs font-bold text-[#565B5C] uppercase tracking-[3px] block mb-3">Portefølje</span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#162022] tracking-tight leading-tight max-w-[800px]">
+        Prosjekter som gjør en forskjell
+      </h1>
+      <p class="text-[#3F4344] font-light leading-relaxed max-w-[600px] mt-4 text-[17px] md:text-[19px]">
+        Vi jobber på tvers av kanaler og fagområder for å skape helhetlige løsninger som varer. Her er noen av våre favorittarbeider.
+      </p>
+    </div>
+  </section>
+
+  <!-- Portfolio Grid section -->
+  <section class="py-20 md:py-28 bg-white px-6">
+    <div class="max-w-[1600px] mx-auto">
+      
+      <!-- Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {allCases.map((item) => (
+          <CaseCard 
+            title={item.title} 
+            category={item.category} 
+            description={item.description} 
+            image={item.image} 
+            href={item.href}
+          />
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+</BaseLayout>

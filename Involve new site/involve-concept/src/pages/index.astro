@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CaseCard from '../components/CaseCard.astro';
+
+// Placeholder client logos using elegant inline SVGs
+const clientLogos = [
+  { name: 'SALMA', label: 'Salma' },
+  { name: 'RUTER', label: 'Ruter' },
+  { name: 'NFF', label: 'NFF' },
+  { name: 'RINGNES', label: 'Ringnes' },
+  { name: 'DEFENDER', label: 'Defender' },
+  { name: 'GRETTE', label: 'Grette' }
+];
+
+// Portfolio items replicating live cases
+const cases = [
+  {
+    title: 'Gul jul med Schweppes',
+    category: 'Reklame & Markedsføring',
+    description: 'Noen ganger er det mest effektive å stå støtt når alle andre skrur opp volumet. I et ellers julemettet bybilde valgte Schweppes å stå støtt i det de allerede eier, og gjorde heller julen gul.',
+    image: 'https://involve.no/wp-content/uploads/2026/02/Presentasjon_Schweppes-OOH_4_Side_6.jpg',
+    href: '/prosjekter/schweppes'
+  },
+  {
+    title: 'Salma er tilbake',
+    category: 'Design & Identitet',
+    description: 'SALMA har alltid vært noe mer enn bare laks. Det er en merkevare nordmenn forbinder med kvalitet, stolthet og matglede. Da den forsvant fra markedet i 2024, ble savnet stort – både hos forbrukere, butikker og kokker.',
+    image: 'https://involve.no/wp-content/uploads/2025/11/SALMA-ER-TILBAKE_Hellstrom-ved-disk.avif',
+    href: '/prosjekter/salma'
+  },
+  {
+    title: 'Ragasco. 25 år. 25 millioner historier.',
+    category: 'Komplett Kommunikasjon',
+    description: 'I 2025 markerte gassflaskeprodusenten Ragasco en viktig milepæl – nemlig 25 år. Involve har utviklet og levert den globale jubileumskampanjen på tvers av digitale og fysiske flater.',
+    image: 'https://involve.no/wp-content/uploads/2025/11/Jubileum_jubileumslogo_negativ_1350x1080.png',
+    href: '/prosjekter/ragasco'
+  },
+  {
+    title: 'Kreftforeningen – Din bit gjør en forskjell',
+    category: 'Design & Identitet',
+    description: 'Når du fyller år (eller gifter deg!), får du gjerne gaver du ikke trenger. Samtidig er det mange som ønsker å bruke anledningen til noe mer meningsfullt – som å støtte en god sak.',
+    image: 'https://involve.no/wp-content/uploads/2025/09/Kreftforeningen_fremhevet-bilde_03-scaled.png',
+    href: '/prosjekter/kreftforeningen'
+  }
+];
+---
+
+<BaseLayout title="Hjem - Involve! Advertising, Oslo" description="Når ideer møter teknologi og kompetanse, skapes sterke resultater – sammen.">
+  
+  <!-- Hero Section with Live Vimeo Video Background -->
+  <section class="relative min-h-[70vh] lg:min-h-[85vh] flex items-center justify-center overflow-hidden bg-[#162022] text-white px-6">
+    
+    <!-- Background Video Wrapper -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+      <iframe 
+        src="https://player.vimeo.com/video/1111602659?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&portrait=0&dnt=1" 
+        class="absolute top-1/2 left-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full -translate-x-1/2 -translate-y-1/2 opacity-35"
+        frameborder="0" 
+        allow="autoplay; fullscreen" 
+        allowfullscreen>
+      </iframe>
+      <!-- Overlay Gradient for Readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-[#162022]/80 via-[#162022]/60 to-[#162022]"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative max-w-[1200px] mx-auto text-center z-10 py-24">
+      <span class="inline-block text-[#F5FF8C] font-semibold text-[13px] tracking-[2.5px] uppercase mb-6 bg-[#F5FF8C]/10 px-4 py-1.5 rounded-full border border-[#F5FF8C]/20">
+        Involve! Advertising
+      </span>
+      <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-10 max-w-[980px] mx-auto">
+        Når ideer møter teknologi og kompetanse, skapes sterke resultater – sammen
+      </h1>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a 
+          href="/prosjekter" 
+          class="w-full sm:w-auto px-8 py-3.5 rounded-[5px] bg-[#F5FF8C] text-[#162022] font-semibold transition-all duration-300 hover:bg-white hover:scale-105 shadow-md text-center text-[15px]"
+        >
+          Se våre prosjekter
+        </a>
+        <a 
+          href="/kontakt" 
+          class="w-full sm:w-auto px-8 py-3.5 rounded-[5px] bg-transparent border border-white/30 hover:border-white text-white font-semibold transition-all duration-300 hover:bg-white/5 text-center text-[15px]"
+        >
+          Kontakt oss
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Client Logo Banner Placeholder Section -->
+  <section class="py-12 bg-white border-b border-[#E7E7E7]/50 px-6">
+    <div class="max-w-[1600px] mx-auto">
+      <p class="text-center text-xs uppercase tracking-[2px] text-[#565B5C] font-semibold mb-8">
+        Vi samarbeider med sterke merkevarer
+      </p>
+      
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-65">
+        {clientLogos.map((logo) => (
+          <div class="h-16 flex items-center justify-center grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer w-full max-w-[140px] p-2 bg-[#F9F9F9]/50 rounded-lg border border-[#E7E7E7]/20">
+            <span class="text-[#162022] font-extrabold tracking-widest text-lg font-mono">{logo.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Responsive Cases Grid Section -->
+  <section class="py-24 bg-white px-6">
+    <div class="max-w-[1600px] mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div>
+          <span class="text-xs font-bold text-[#565B5C] uppercase tracking-[3px] block mb-3">Siste prosjekter</span>
+          <h2 class="text-3xl md:text-4xl font-bold text-[#162022] tracking-tight">Utvalgte arbeider</h2>
+        </div>
+        <a 
+          href="/prosjekter" 
+          class="inline-flex items-center text-[#162022] font-bold text-sm hover:underline group gap-1"
+        >
+          Se alle caser
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Responsive Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {cases.map((item) => (
+          <CaseCard 
+            title={item.title} 
+            category={item.category} 
+            description={item.description} 
+            image={item.image} 
+            href={item.href}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Who is Involve Section -->
+  <section class="py-24 bg-[#F9F9F9] px-6">
+    <div class="max-w-[1200px] mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+        <div class="lg:col-span-5">
+          <span class="text-xs font-bold text-[#565B5C] uppercase tracking-[3px] block mb-4">Hvem er Involve?</span>
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-[#162022] leading-[1.1] tracking-tight">
+            Merkevarer blir sterkest når folk kjenner seg hjemme i dem.
+          </h2>
+        </div>
+        <div class="lg:col-span-7">
+          <p class="text-lg md:text-xl text-[#3F4344] font-light leading-relaxed mb-6">
+            Involve er ikke bare et navn – det er et løfte. Vi tror på synergier. Derfor skaper vi løsninger som engasjerer, beveger og bygger ekte relasjoner – på tvers av reklame, PR, design og digitale flater.
+          </p>
+          <p class="text-[#565B5C] font-light leading-relaxed">
+            Med et bredt kompetansemiljø under samme tak hjelper vi selskaper med å forenkle komplekse budskap, styrke merkeidentiteten og levere strategisk markedsføring som skaper dokumenterte resultater.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features / How we work Section -->
+  <section class="py-24 bg-white px-6">
+    <div class="max-w-[1200px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        
+        <!-- Feature 1 -->
+        <div class="group bg-[#F9F9F9] rounded-xl p-8 md:p-12 border border-[#E7E7E7]/35 transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:bg-white hover:border-[#F5FF8C]">
+          <div class="w-12 h-12 rounded-lg bg-[#F5FF8C]/20 text-[#162022] flex items-center justify-center font-bold text-lg mb-8 group-hover:bg-[#F5FF8C] transition-colors">
+            01
+          </div>
+          <h3 class="text-2xl font-bold text-[#162022] mb-4">Alt under ett tak</h3>
+          <p class="text-[#3F4344] font-light leading-relaxed">
+            Involve Advertising leverer reklame, innholdsproduksjon, digital markedsføring, design, AI-tjenester – og alt annet som kan være relevant for å løfte din synlighet. Vi jobber tett med våre søsterselskaper innen nettsider, produksjon og profilering.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="group bg-[#F9F9F9] rounded-xl p-8 md:p-12 border border-[#E7E7E7]/35 transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:bg-white hover:border-[#F5FF8C]">
+          <div class="w-12 h-12 rounded-lg bg-[#F5FF8C]/20 text-[#162022] flex items-center justify-center font-bold text-lg mb-8 group-hover:bg-[#F5FF8C] transition-colors">
+            02
+          </div>
+          <h3 class="text-2xl font-bold text-[#162022] mb-4">Kjappe og fleksible</h3>
+          <p class="text-[#3F4344] font-light leading-relaxed">
+            Vi er en fleksibel gjeng som tilpasser oss raskt! Endrer behovene seg underveis, eller viser det seg at utfordringen egentlig er noe helt annet? Ikke noe problem. Vi snur oss rundt og finner den løsningen som passer best for deg.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>

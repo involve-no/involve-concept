@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const services = [
+  {
+    num: '01',
+    title: 'Reklame og markedsføring',
+    description: 'Reklame handler ikke bare om å synes. Det handler om å bli valgt. Hos oss får du kampanjer som engasjerer, bygger merkevare og gir resultater. Kreatørene våre bruker innsikt, analyse og målgruppeforståelse for å treffe blink med budskapet.'
+  },
+  {
+    num: '02',
+    title: 'Design og identitet',
+    description: 'Involve er et kløktig designbyrå som leverer strategisk rådgivning, navneprosesser, logo og visuelle identiteter, pakningsdesign og komplette merkevarekonsepter. Alt henger sammen, og alt skjer under samme tak.'
+  },
+  {
+    num: '03',
+    title: 'PR og rådgivning',
+    description: 'Involve er et PR-byrå med solid teft for journalistikk, PR og content marketing. Vi skreddersyr kommunikasjon som bygger omdømme, skaper tillit og får budskapet ditt ut der det betyr noe.'
+  },
+  {
+    num: '04',
+    title: 'Content og sosiale medier',
+    description: 'Vi ser nye trender, behov og muligheter i både tradisjonelle og utradisjonelle kanaler og utforsker nye måter å treffe dine kunder på. Vi jobber innovativt og utadvendt med å fornye både innhold og uttak.'
+  },
+  {
+    num: '05',
+    title: 'Webdesign og utvikling',
+    description: 'På huset bygges nettsider og nettbutikker for alle typer kunder, enten i eksisterende systemer eller helt fra bunnen. Fagfolka våre jobber aktivt med brukervennlighet for å øke konvertering og trafikk.'
+  },
+  {
+    num: '06',
+    title: 'SEO og SEM',
+    description: 'De fleste kundereiser starter med et søk. Vi hjelper deg å bli synlig når og der det gjelder. Vi har lang erfaring med både søkemotoroptimalisering (SEO) og søkemotormarkedsføring (SEM) som gir resultater.'
+  },
+  {
+    num: '07',
+    title: 'Digital markedsføring',
+    description: 'Enten du vil bygge synlighet eller få flere til å klikke “kjøp”, handler det om én ting: å nå riktig folk med riktig budskap. Våre fagfolk utvikler digitale strategier som virker på tvers av kanaler.'
+  },
+  {
+    num: '08',
+    title: 'Markedsstrategi og innsikt',
+    description: 'Vi hjelper deg med å nå målene dine ved å bygge en tydelig markedsstrategi basert på skikkelig innsikt. Når vi forstår både målgruppen, markedet og merkevaren din, blir det mye enklere å treffe blink.'
+  },
+  {
+    num: '09',
+    title: 'Merkevare & komm.strategi',
+    description: 'Sterke merkevarer bygges med tydelighet, retning og en god dose menneskelighet. Vi hjelper deg å utvikle en kommunikasjonsstrategi som gir gjennomslag og fungerer i praksis, uansett kanal.'
+  },
+  {
+    num: '10',
+    title: 'Kunstig intelligens (AI)',
+    description: 'AI (eller KI, om du vil) er ikke noe vi eksperimenterer med på siden. Det er en naturlig del av hverdagen vår. Vi bruker teknologien der den gir verdi, og sørger for at den spiller på lag med kreativiteten.'
+  }
+];
+---
+
+<BaseLayout title="Tjenester - Hva vi kan levere" description="Se våre kjerneområder innen reklame, PR, design, digital markedsføring, web og AI.">
+  
+  <!-- Page Header -->
+  <section class="bg-[#F9F9F9] border-b border-[#E7E7E7]/40 py-20 px-6 mt-20">
+    <div class="max-w-[1600px] mx-auto">
+      <span class="text-xs font-bold text-[#565B5C] uppercase tracking-[3px] block mb-3">Vår kompetanse</span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#162022] tracking-tight leading-tight">
+        Dette er hva vi gjør
+      </h1>
+      <p class="text-[#3F4344] font-light leading-relaxed max-w-[600px] mt-4 text-[17px] md:text-[19px]">
+        Vi tilpasser teamet fra prosjekt til prosjekt for å gi deg best mulig effekt. Her er våre kjerneområder.
+      </p>
+    </div>
+  </section>
+
+  <!-- Core Services Grid/List Section -->
+  <section class="py-20 md:py-28 bg-white px-6">
+    <div class="max-w-[1600px] mx-auto">
+      
+      <!-- Premium Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {services.map((svc) => (
+          <div class="group flex flex-col justify-between bg-[#F9F9F9] rounded-xl p-8 md:p-10 border border-[#E7E7E7]/35 transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:bg-white hover:border-[#F5FF8C]">
+            <div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-[14px] font-bold text-[#162022] bg-[#F5FF8C] group-hover:bg-[#F6FF45] px-3 py-1 rounded-[4px] transition-colors">
+                  {svc.num}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#565B5C]/40 group-hover:text-[#162022] transition-colors duration-300">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-[#162022] mb-4 group-hover:text-[#565B5C] transition-colors">
+                {svc.title}
+              </h3>
+              <p class="text-sm font-light text-[#3F4344] leading-relaxed">
+                {svc.description}
+              </p>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-[#E7E7E7]/60 group-hover:border-[#162022]/10 transition-colors">
+              <a href="/kontakt" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#162022] uppercase tracking-wider hover:underline">
+                Prat med en ekspert
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+</BaseLayout>

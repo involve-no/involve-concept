@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const images = [
+  {
+    src: 'https://involve.no/wp-content/uploads/2025/08/0011_HMH_1436.jpg',
+    alt: 'Samarbeid på kontoret'
+  },
+  {
+    src: 'https://involve.no/wp-content/uploads/2025/08/Felles_jobbing.jpg',
+    alt: 'Felles jobbing og idéutvikling'
+  },
+  {
+    src: 'https://involve.no/wp-content/uploads/2025/08/0016_HMH_1119.jpg',
+    alt: 'Involve teamet i diskusjon'
+  },
+  {
+    src: 'https://involve.no/wp-content/uploads/2025/08/0018_HMH_1008.jpg',
+    alt: 'Kreativt arbeidsmiljø'
+  }
+];
+---
+
+<BaseLayout title="Om oss - Involve! Advertising, Oslo" description="Vi heter Involve, og det er med vilje. Lær mer om vårt fullservice PR- og reklamebyrå i Oslo.">
+  
+  <!-- Breadcrumbs & Hero Title Section -->
+  <section class="bg-[#F9F9F9] border-b border-[#E7E7E7]/40 py-20 px-6 mt-20">
+    <div class="max-w-[1200px] mx-auto">
+      <nav class="text-[13px] text-[#565B5C] font-medium mb-6 flex items-center gap-2">
+        <a href="/" class="hover:text-[#162022] transition-colors">Hjem</a>
+        <span>/</span>
+        <span class="text-[#162022] font-semibold">Om oss</span>
+      </nav>
+      <span class="text-xs font-bold text-[#565B5C] uppercase tracking-[3px] block mb-3">
+        Lurer du på hvordan vi ser ut?
+      </span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#162022] tracking-tight leading-tight max-w-[850px]">
+        Her er de flotte folka som jobber i Involve
+      </h1>
+    </div>
+  </section>
+
+  <!-- Intro Text Block -->
+  <section class="py-20 bg-white px-6">
+    <div class="max-w-[900px] mx-auto space-y-8">
+      <h2 class="text-3xl md:text-4xl font-bold text-[#162022] tracking-tight leading-snug">
+        Vi heter Involve, og det er med vilje.
+      </h2>
+      <div class="text-[#3F4344] text-[18px] md:text-[21px] font-light leading-relaxed space-y-6">
+        <p>
+          For vi tror at den beste måten å bygge sterke merkevarer på, er å engasjere målgruppen. Ikke bare snakke til dem, men involvere dem. En god idé skal merkes, deles og føles. Derfor gjør vi nettopp det – på tvers av reklame, PR, design, innhold og digitale flater.
+        </p>
+        <p>
+          Vi er et fullservice PR- og reklamebyrå med base i Oslo. Hos oss finner du folk som kan alt fra konsept og kampanje til innholdsproduksjon, influencer-arbeid, webdesign, kunstig intelligens, foto, film og merkevarebygging. Alt under samme tak, og alt med mål om å lage løsninger som faktisk virker.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium Image Gallery Section -->
+  <section class="py-12 bg-[#F9F9F9] px-6 border-y border-[#E7E7E7]/30">
+    <div class="max-w-[1200px] mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {images.map((img) => (
+          <div class="aspect-square overflow-hidden rounded-[12px] bg-white border border-[#E7E7E7]/40 shadow-sm group">
+            <img 
+              src={img.src} 
+              alt={img.alt} 
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Culture & Network Section -->
+  <section class="py-20 bg-white px-6">
+    <div class="max-w-[900px] mx-auto space-y-8">
+      <div class="text-[#3F4344] text-[18px] md:text-[21px] font-light leading-relaxed space-y-6">
+        <p>
+          Vi er kjent for å ha et godt arbeidsmiljø med høy faglig kompetanse, lav terskel for nye ideer og en sterk lidenskap for faget. Det merkes, både i arbeidet og i relasjonene vi bygger med hverandre og med kundene våre.
+        </p>
+        <p>
+          Vi jobber tett med dyktige samarbeidspartnere i hele Norden – <strong>JMW Golin</strong> i Stockholm, <strong>Kompas Kommunikation</strong> i København og <strong>Ahjo Communications</strong> i Helsingfors – og sammen sørger vi for at ideene våre når langt.
+        </p>
+      </div>
+
+      <!-- Nordic Partnership Highlights -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12">
+        <div class="p-6 bg-[#F9F9F9] rounded-[10px] border border-[#E7E7E7]/50 text-center">
+          <span class="block text-xs uppercase tracking-wider text-[#565B5C] font-semibold mb-2">Stockholm</span>
+          <span class="text-[17px] font-bold text-[#162022]">JMW Golin</span>
+        </div>
+        <div class="p-6 bg-[#F9F9F9] rounded-[10px] border border-[#E7E7E7]/50 text-center">
+          <span class="block text-xs uppercase tracking-wider text-[#565B5C] font-semibold mb-2">København</span>
+          <span class="text-[17px] font-bold text-[#162022]">Kompas Kommunikation</span>
+        </div>
+        <div class="p-6 bg-[#F9F9F9] rounded-[10px] border border-[#E7E7E7]/50 text-center">
+          <span class="block text-xs uppercase tracking-wider text-[#565B5C] font-semibold mb-2">Helsingfors</span>
+          <span class="text-[17px] font-bold text-[#162022]">Ahjo Communications</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>

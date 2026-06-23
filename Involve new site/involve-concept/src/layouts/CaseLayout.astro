@@ -1,0 +1,56 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout 
+  title={`${frontmatter.title} - Casestudie`} 
+  description={frontmatter.description || `Casestudie for kunde ${frontmatter.client}`}
+>
+  <article class="max-w-[900px] mx-auto px-6 py-20 md:py-28">
+    
+    <!-- Meta details -->
+    <div class="mb-12 border-b border-[#E7E7E7]/50 pb-12">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="bg-[#F5FF8C] text-[#162022] font-semibold text-[11px] uppercase tracking-wider px-3 py-1 rounded-[4px]">
+          Casestudie
+        </span>
+        {frontmatter.client && (
+          <span class="text-[12px] text-[#565B5C] font-semibold tracking-wide">
+            Kunde: {frontmatter.client}
+          </span>
+        )}
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#162022] leading-tight mb-8">
+        {frontmatter.title}
+      </h1>
+
+      {frontmatter.image && (
+        <div class="w-full aspect-[16/9] overflow-hidden rounded-[15px] bg-[#F9F9F9] border border-[#E7E7E7]/30 shadow-md">
+          <img 
+            src={frontmatter.image} 
+            alt={frontmatter.title} 
+            class="w-full h-full object-cover"
+          />
+        </div>
+      )}
+    </div>
+
+    <!-- Article Body Slot -->
+    <div class="prose max-w-none text-[#3F4344] text-[17px] md:text-[19px] font-light leading-relaxed space-y-6">
+      <slot />
+    </div>
+
+    <div class="mt-20 pt-8 border-t border-[#E7E7E7]/50 text-center">
+      <a 
+        href="/prosjekter" 
+        class="inline-flex items-center justify-center px-6 py-3 bg-[#162022] hover:bg-[#3F4344] text-white font-semibold rounded-[5px] transition-all duration-300 text-sm hover:scale-102"
+      >
+        Tilbake til alle prosjekter
+      </a>
+    </div>
+
+  </article>
+</BaseLayout>

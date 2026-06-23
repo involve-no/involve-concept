@@ -1,0 +1,322 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Involve! Advertising, Oslo", 
+  description = "Når ideer møter teknologi og kompetanse, skapes sterke resultater – sammen." 
+} = Astro.props;
+
+const navLinks = [
+  { href: "/prosjekter", label: "Prosjekter" },
+  { href: "/om-oss", label: "Om oss" },
+  { href: "/tjenester", label: "Tjenester" },
+  { href: "/ansatte", label: "Ansatte" },
+  { href: "/aktuelt", label: "Aktuelt" },
+  { href: "/kontakt", label: "Kontakt", isButton: true }
+];
+---
+
+<!DOCTYPE html>
+<html lang="nb-NO" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="https://involve.no/wp-content/uploads/2025/09/cropped-favocon_adv-32x32.jpg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background-color: #FFFFFF;
+        color: #3F4344;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen pt-20 overflow-x-hidden">
+    
+    <!-- Fixed Navigation Header -->
+    <header class="fixed top-0 left-0 w-full h-20 bg-white border-b border-[#E7E7E7]/50 z-50 transition-all duration-300">
+      <div class="max-w-[1600px] h-full mx-auto px-6 md:px-12 flex items-center justify-between">
+        
+        <!-- Logo -->
+        <div class="flex-shrink-0 flex items-center">
+          <a href="/" class="flex items-center" aria-label="Hjemmeside">
+            <img 
+              width="174" 
+              height="45" 
+              src="https://involve.no/wp-content/uploads/2025/08/logo-involve.svg" 
+              alt="Involve Logo" 
+              class="h-9 md:h-11 w-auto transition-transform duration-300 hover:scale-102"
+            />
+          </a>
+        </div>
+
+        <!-- Desktop Navigation (Center) -->
+        <nav class="hidden md:flex items-center gap-1 lg:gap-2" aria-label="Hovedmeny">
+          {navLinks.map((link) => {
+            if (link.isButton) {
+              return (
+                <a 
+                  href={link.href} 
+                  class="ml-3 px-5 py-2.5 rounded-[5px] bg-[#F5FF8C] text-[#162022] font-semibold text-[15px] border border-[#F5FF8C] transition-all duration-300 hover:bg-white hover:border-[#E7E7E7] hover:scale-102 hover:shadow-sm"
+                >
+                  {link.label}
+                </a>
+              );
+            }
+            return (
+              <a 
+                href={link.href} 
+                class="px-4 py-2 rounded-[5px] text-[#162022] hover:text-[#3F4344] font-medium text-[15px] transition-all duration-300 hover:bg-[#F9F9F9] hover:scale-102"
+              >
+                {link.label}
+              </a>
+            );
+          })}
+        </nav>
+
+        <!-- Desktop Corporate Affiliation (Right) -->
+        <div class="hidden lg:flex flex-col text-right text-[11px] text-[#565B5C] leading-normal max-w-[200px]">
+          <span>En del av</span>
+          <a 
+            href="https://huset.involve.no/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="font-semibold text-[#162022] hover:underline"
+          >
+            Kommunikasjonshuset Involve
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle Button (Burger) -->
+        <button 
+          id="mobile-menu-toggle"
+          class="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
+          aria-label="Åpne meny"
+          aria-expanded="false"
+        >
+          <span class="w-6 h-0.5 bg-[#162022] mb-1.5 transition-transform duration-300 origin-center" id="burger-line-1"></span>
+          <span class="w-6 h-0.5 bg-[#162022] mb-1.5 transition-opacity duration-300" id="burger-line-2"></span>
+          <span class="w-6 h-0.5 bg-[#162022] transition-transform duration-300 origin-center" id="burger-line-3"></span>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Mobile Drawer Menu -->
+    <div 
+      id="mobile-drawer" 
+      class="fixed inset-0 top-20 bg-white z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden flex flex-col justify-between p-8 border-t border-[#E7E7E7]/50"
+    >
+      <nav class="flex flex-col gap-4 mt-6">
+        {navLinks.map((link) => {
+          if (link.isButton) {
+            return (
+              <a 
+                href={link.href} 
+                class="w-full text-center py-4 rounded-[5px] bg-[#F5FF8C] text-[#162022] font-semibold text-lg border border-[#F5FF8C] transition-all duration-300 hover:bg-white hover:border-[#E7E7E7] block"
+              >
+                {link.label}
+              </a>
+            );
+          }
+          return (
+            <a 
+              href={link.href} 
+              class="w-full py-3 px-4 rounded-[5px] text-[#162022] font-medium text-lg transition-all duration-300 hover:bg-[#F9F9F9] block"
+            >
+              {link.label}
+            </a>
+          );
+        })}
+      </nav>
+
+      <div class="flex flex-col items-center text-center text-xs text-[#565B5C] gap-1 pb-12">
+        <span>En del av</span>
+        <a 
+          href="https://huset.involve.no/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="font-semibold text-[#162022] text-sm hover:underline"
+        >
+          Kommunikasjonshuset Involve
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Slot -->
+    <main class="w-full">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-[#E7E7E7]/50 pt-16 pb-8 px-6 md:px-12">
+      <div class="max-w-[1600px] mx-auto">
+        
+        <!-- Top Section: Form + Link Grids -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16">
+          
+          <!-- Newsletter Signup (left 5 columns) -->
+          <div class="lg:col-span-5 flex flex-col justify-start">
+            <h3 class="text-xl md:text-2xl font-bold text-[#162022] leading-tight mb-6 max-w-[420px]">
+              Få trender, tips og seminarinvitasjoner rett i innboksen – kvartalsvis
+            </h3>
+            
+            <form id="footer-newsletter" class="w-full max-w-[450px] mb-4">
+              <div class="flex items-center border-b border-[#162022] py-2">
+                <input 
+                  type="email" 
+                  placeholder="Din e-post" 
+                  required 
+                  class="appearance-none bg-transparent border-none w-full text-[#162022] mr-3 py-1 px-2 leading-tight focus:outline-none placeholder-[#565B5C]/60 text-[15px]"
+                />
+                <button 
+                  type="submit" 
+                  aria-label="Send inn"
+                  class="flex-shrink-0 text-[#162022] hover:scale-110 transition-transform duration-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18" fill="none" class="w-5 h-5">
+                    <path d="M1.56189 9H18.4369" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10.5619 16.875L18.4369 9L10.5619 1.125" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="flex items-start mt-4 gap-2.5">
+                <input 
+                  type="checkbox" 
+                  id="acceptance" 
+                  required 
+                  class="mt-1 cursor-pointer accent-[#F5FF8C]"
+                />
+                <label for="acceptance" class="text-[11px] text-[#565B5C] leading-snug">
+                  Jeg ønsker å motta nyhetsbrev og jeg har lest og satt meg inn i 
+                  <a href="/personvernerklaering" class="underline hover:no-underline text-[#162022]">personvernerklæringen</a>.
+                </label>
+              </div>
+            </form>
+          </div>
+
+          <!-- Vertical Menus Grid (right 7 columns) -->
+          <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+            
+            <!-- Menu Column 1: Meny -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-[#565B5C] mb-4">Meny</h4>
+              <ul class="flex flex-col gap-2.5 text-[14px]">
+                <li><a href="/om-oss" class="text-[#162022] hover:text-[#565B5C] transition-colors">Om oss</a></li>
+                <li><a href="/kontakt" class="text-[#162022] hover:text-[#565B5C] transition-colors">Kontakt</a></li>
+                <li><a href="/miljofyrtarn" class="text-[#162022] hover:text-[#565B5C] transition-colors">Miljøfyrtårn</a></li>
+              </ul>
+            </div>
+
+            <!-- Menu Column 2: Selskaper -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-[#565B5C] mb-4">Selskaper</h4>
+              <ul class="flex flex-col gap-2.5 text-[14px]">
+                <li><a href="/" class="text-[#162022] hover:text-[#565B5C] transition-colors">Involve Advertising</a></li>
+                <li><a href="https://pro-x.no/" target="_blank" rel="noopener noreferrer" class="text-[#162022] hover:text-[#565B5C] transition-colors">Involve Pro-X</a></li>
+                <li><a href="https://profileringsartikler.no/" target="_blank" rel="noopener noreferrer" class="text-[#162022] hover:text-[#565B5C] transition-colors">Profileringsartikler</a></li>
+              </ul>
+            </div>
+
+            <!-- Menu Column 3: Sosial -->
+            <div class="col-span-2 sm:col-span-1">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-[#565B5C] mb-4">Sosial</h4>
+              <ul class="flex flex-col gap-2.5 text-[14px]">
+                <li><a href="https://www.linkedin.com/company/involve-" target="_blank" rel="noopener noreferrer" class="text-[#162022] hover:text-[#565B5C] transition-colors">LinkedIn</a></li>
+                <li><a href="https://www.facebook.com/involveoslo/" target="_blank" rel="noopener noreferrer" class="text-[#162022] hover:text-[#565B5C] transition-colors">Facebook</a></li>
+                <li><a href="https://www.instagram.com/involveoslo" target="_blank" rel="noopener noreferrer" class="text-[#162022] hover:text-[#565B5C] transition-colors">Instagram</a></li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Middle Section: Logo and Description -->
+        <div class="border-t border-[#E7E7E7] pt-12 pb-8 flex flex-col md:flex-row items-start md:items-center gap-6">
+          <img 
+            width="100" 
+            height="26" 
+            src="https://involve.no/wp-content/uploads/2025/08/logo-involve.svg" 
+            alt="Involve Logo" 
+            class="h-6 w-auto"
+          />
+          <div class="flex flex-col gap-1.5">
+            <a href="https://huset.involve.no/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#162022] hover:underline text-[14px]">
+              Kommunikasjonshuset Involve
+            </a>
+            <p class="text-[12px] text-[#565B5C]">
+              PR / Design / Reklame / Film / Web &amp; animation / Sosiale medier / Profileringsartikler / Produksjon
+            </p>
+          </div>
+        </div>
+
+        <!-- Bottom Section: Copyright & Privacy link -->
+        <div class="border-t border-[#E7E7E7]/40 pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-[12px] text-[#565B5C]">
+          <span>&copy; {new Date().getFullYear()} Involve. Alle rettigheter reservert.</span>
+          <a href="/personvernerklaering" class="hover:underline text-[#162022]">Personvernerklæring</a>
+        </div>
+
+      </div>
+    </footer>
+
+    <!-- JavaScript to control mobile menu drawer toggling -->
+    <script>
+      const toggleBtn = document.getElementById('mobile-menu-toggle');
+      const drawer = document.getElementById('mobile-drawer');
+      const line1 = document.getElementById('burger-line-1');
+      const line2 = document.getElementById('burger-line-2');
+      const line3 = document.getElementById('burger-line-3');
+
+      if (toggleBtn && drawer && line1 && line2 && line3) {
+        let isOpen = false;
+
+        const toggleMenu = () => {
+          isOpen = !isOpen;
+          toggleBtn.setAttribute('aria-expanded', String(isOpen));
+          
+          if (isOpen) {
+            // Open drawer
+            drawer.classList.remove('translate-x-full');
+            // Animate burger to 'X'
+            line1.classList.add('rotate-45', 'translate-y-2');
+            line2.classList.add('opacity-0');
+            line3.classList.add('-rotate-45', '-translate-y-2');
+            document.body.classList.add('overflow-hidden');
+          } else {
+            // Close drawer
+            drawer.classList.add('translate-x-full');
+            // Animate burger back
+            line1.classList.remove('rotate-45', 'translate-y-2');
+            line2.classList.remove('opacity-0');
+            line3.classList.remove('-rotate-45', '-translate-y-2');
+            document.body.classList.remove('overflow-hidden');
+          }
+        };
+
+        toggleBtn.addEventListener('click', toggleMenu);
+
+        // Close drawer when clicking a link
+        const drawerLinks = drawer.querySelectorAll('a');
+        drawerLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            if (isOpen) toggleMenu();
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
