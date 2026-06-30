@@ -392,6 +392,8 @@ export default function LeaderboardPage() {
                                 className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${
                                   pred.points === 3
                                     ? 'bg-amber-500/20 text-amber-300'
+                                    : pred.points === 2
+                                    ? 'bg-emerald-500/20 text-emerald-300'
                                     : pred.points === 1
                                     ? 'bg-blue-500/20 text-blue-300'
                                     : 'bg-gray-500/20 text-gray-400'
@@ -399,6 +401,8 @@ export default function LeaderboardPage() {
                               >
                                 {pred.points === 3
                                   ? 'Eksakt (+3)'
+                                  : pred.points === 2
+                                  ? 'Uavgjort (+2)'
                                   : pred.points === 1
                                   ? m.id >= 'M073' && m.scoreA === m.scoreB
                                     ? 'Riktig videre (+1)'

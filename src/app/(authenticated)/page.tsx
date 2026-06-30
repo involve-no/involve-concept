@@ -616,6 +616,8 @@ export default function MatchesPage() {
                   className={`px-2 py-0.5 rounded-full font-bold text-[9px] ${
                     match.prediction.points === 3
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      : match.prediction.points === 2
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                       : match.prediction.points === 1
                       ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                       : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
@@ -623,6 +625,8 @@ export default function MatchesPage() {
                 >
                   {match.prediction.points === 3
                     ? 'Eksakt (+3)'
+                    : match.prediction.points === 2
+                    ? 'Uavgjort (+2)'
                     : match.prediction.points === 1
                     ? 'Utfall (+1)'
                     : 'Feil (+0)'}
@@ -684,6 +688,21 @@ export default function MatchesPage() {
                 {exactTippere.filter(p => p.userId !== currentUser?.id).length > 0 && (
                   <div className="text-[9px] text-gray-400 mt-1">
                     Andre med eksakt treff: {exactTippere.filter(p => p.userId !== currentUser?.id).map(p => p.userName).join(', ')}
+                  </div>
+                )}
+              </div>
+            ) : match.prediction?.points === 2 ? (
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-200 flex flex-col gap-0.5 leading-snug">
+                <div className="flex items-center gap-1 font-black uppercase text-[9px] text-emerald-400">
+                  🤝 Riktig uavgjort!
+                </div>
+                <div>
+                  Du tippet uavgjort ({match.prediction.predictedScoreA}-{match.prediction.predictedScoreB}) og at{' '}
+                  <strong>{match.prediction.predictedWinner === 'teamA' ? match.teamA : match.teamB}</strong> gikk videre! (+2 poeng)
+                </div>
+                {exactTippere.length > 0 && (
+                  <div className="text-[9px] text-gray-400 mt-1">
+                    Eksakt treff av: {exactTippere.map(p => p.userName).join(', ')}
                   </div>
                 )}
               </div>
