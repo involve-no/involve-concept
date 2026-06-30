@@ -39,6 +39,8 @@ export async function GET() {
           if (predictedWinner === actualWinner) {
             if (p.predictedScoreA === p.scoreA && p.predictedScoreB === p.scoreB) {
               points = 3;
+            } else if (p.predictedScoreA === p.predictedScoreB && p.scoreA === p.scoreB) {
+              points = 2;
             } else {
               points = 1;
             }

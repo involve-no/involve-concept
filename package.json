@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:seed": "tsx src/scripts/seed.ts",
     "db:update-teams": "tsx src/scripts/updateMatches.ts",
-    "db:init": "tsx src/scripts/seed.ts && tsx src/scripts/updateMatches.ts"
+    "db:init": "tsx src/scripts/seed.ts && tsx src/scripts/updateMatches.ts && tsx src/scripts/recalculatePoints.ts"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",

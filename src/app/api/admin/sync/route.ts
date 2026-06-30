@@ -79,6 +79,11 @@ const calculatePoints = (
     return 3;
   }
 
+  // Guessing correct draw outcome + correct winner, but wrong score
+  if (predA === predB && actA === actB) {
+    return 2;
+  }
+
   return 1;
 };
 
