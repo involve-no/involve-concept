@@ -166,12 +166,14 @@ export async function POST(request: Request) {
           }
         }
 
-        const hasScore = ofM.score && ofM.score.ft && ofM.score.ft.length === 2;
+        const hasScore = ofM.score && (ofM.score.et || ofM.score.ft) && (ofM.score.et?.length === 2 || ofM.score.ft?.length === 2);
         if (hasScore) {
-          const actA = ofM.score.ft[0];
-          const actB = ofM.score.ft[1];
-          const actPA = (ofM.score.ps && ofM.score.ps.length === 2) ? ofM.score.ps[0] : null;
-          const actPB = (ofM.score.ps && ofM.score.ps.length === 2) ? ofM.score.ps[1] : null;
+          const finalScoreArray = (ofM.score.et && ofM.score.et.length === 2) ? ofM.score.et : ofM.score.ft;
+          const actA = finalScoreArray[0];
+          const actB = finalScoreArray[1];
+          const penaltyScoreArray = ofM.score.p || ofM.score.ps;
+          const actPA = (penaltyScoreArray && penaltyScoreArray.length === 2) ? penaltyScoreArray[0] : null;
+          const actPB = (penaltyScoreArray && penaltyScoreArray.length === 2) ? penaltyScoreArray[1] : null;
 
           if (actA !== null && actA !== undefined && actB !== null && actB !== undefined && !isNaN(actA) && !isNaN(actB)) {
             // Update score if match is not finished, or score/penalties/teams changed
