@@ -28,14 +28,13 @@ function seed() {
 
   console.log(`Loaded ${matches.length} matches from schedule file.`);
 
-  // Prepare insert statement
   const insertMatch = db.prepare(`
     INSERT INTO matches (id, description, teamA, teamB, date, stadium, status, scoreA, scoreB)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(id) DO UPDATE SET
       description=excluded.description,
-      teamA=excluded.teamA,
-      teamB=excluded.teamB,
+      teamA=CASE WHEN excluded.teamA != 'TBD' THEN excluded.teamA ELSE matches.teamA END,
+      teamB=CASE WHEN excluded.teamB != 'TBD' THEN excluded.teamB ELSE matches.teamB END,
       date=excluded.date,
       stadium=excluded.stadium
   `);
